@@ -40,7 +40,7 @@ public class ClientRandomWalk
   
   
   
-  public ClientRandomWalk(String host, int portNumber)
+  public ClientRandomWalk(String host, int portNumber) throws IOException
   {
     System.out.println("Starting ClientRandomWalk: " + System.currentTimeMillis());
     isConnected = false;
@@ -154,11 +154,14 @@ public class ClientRandomWalk
     return null;
   }
     
-  public void mainGameLoop(CommData data)
+  public void mainGameLoop(CommData data) throws IOException
   {
       System.out.println("mainGameLoop");
+      AntWorld antworld=new AntWorld(data);
+     // drawAnts(data);
     while (true)
     {
+        antworld.draw(data);
       try
       {
         if (DEBUG) System.out.println("ClientRandomWalk: chooseActions: " + myNestName);
@@ -268,7 +271,7 @@ public class ClientRandomWalk
   
   }
 
-  public static void main(String[] args)
+  public static void main(String[] args) throws IOException
   {
     String serverHost = "b146-76";
     System.out.println(args.length);

@@ -32,7 +32,7 @@ public class Control
   
   public static void readImage()
   {
-    File fle = new File("AntWorld.PNG");
+    File fle = new File("AntWorld.png");
     //BufferedImage img;
     try
     {
