@@ -1,24 +1,27 @@
 package antworld.client;
 
+import static antworld.client.AntWorld.readImage;
+import static antworld.client.AntWorld.yourMap;
+import antworld.data.AntAction;
+import antworld.data.AntAction.AntActionType;
+import antworld.data.AntData;
+import antworld.data.AntType;
+import antworld.data.CommData;
+import antworld.data.Constants;
+import antworld.data.Direction;
+import antworld.data.FoodData;
+import antworld.data.LandType;
+import antworld.data.NestData;
+import antworld.data.NestNameEnum;
+import antworld.data.TeamNameEnum;
+import java.awt.Point;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Random;
-
-import antworld.data.AntAction;
-import antworld.data.AntData;
-import antworld.data.CommData;
-import antworld.data.Constants;
-import antworld.data.Direction;
-import antworld.data.NestNameEnum;
-import antworld.data.TeamNameEnum;
-import antworld.data.AntAction.AntActionType;
-import antworld.data.AntType;
-import static antworld.client.AntWorld.readImage;
-import antworld.data.NestData;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class ClientRandomWalk
 {
@@ -35,6 +38,7 @@ public class ClientRandomWalk
   private Socket clientSocket;
 
   private static Random random = Constants.random;
+    
 
   
   
@@ -165,8 +169,8 @@ public class ClientRandomWalk
       try
       {
         if (DEBUG) System.out.println("ClientRandomWalk: chooseActions: " + myNestName);
-
-        chooseActionsOfAllAnts(data);
+System.out.println("the loop is working");
+        chooseActionsOfAllAnts(data,antworld);
         
  
         
@@ -219,6 +223,7 @@ public class ClientRandomWalk
     try
     {
       if (DEBUG) System.out.println("ClientRandomWalk.sendCommData(" + sendData +")");
+      
       outputStream.writeObject(sendData);
       outputStream.flush();
       outputStream.reset();
@@ -235,16 +240,16 @@ public class ClientRandomWalk
     
   }
 
-  private void chooseActionsOfAllAnts(CommData commData)
+  private void chooseActionsOfAllAnts(CommData commData,AntWorld antworld)
   {
     for (AntData ant : commData.myAntList)
     {
-      AntAction action = chooseAction(commData, ant);
+      AntAction action = chooseAction(commData, ant,antworld);
       ant.myAction = action;
     }
   }
 
-  private AntAction chooseAction(CommData data, AntData ant)
+  private AntAction chooseAction(CommData data, AntData ant,AntWorld world)
   {
     AntAction action = new AntAction(AntActionType.STASIS);
     
@@ -259,8 +264,81 @@ public class ClientRandomWalk
     }
 
     action.type = AntActionType.MOVE;
+   // System.out.println(data.nestData.length);
+  //  NestData nestData=data.nestData[myNestName.ordinal()];
+    
+    Point home=new Point(centerX , centerY);
+    
+    int dx=ant.gridX-home.x;
+    int dy=ant.gridY-home.y;
+    
+    if(dx<0){
+        if(dy<0){
+            action.direction = Direction.SOUTHWEST;
+        }
+             action.direction = Direction.NORTHWEST;
+    }
+    else{
+    if(dy<0){
+            action.direction = Direction.SOUTHEAST;
+        }
+             action.direction = Direction.NORTHEAST;
+             
+    
+    }
+    
+    
     action.direction = Direction.getRandomDir();
-
+    
+  FoodData food= (FoodData) data.foodSet.toArray()[0];
+  int deltax=ant.gridX-food.gridX;
+        int deltay=ant.gridY-food.gridY;
+       System.out.println("FoodCheck:"+Math.abs(food.gridX-ant.gridX)+";"+Math.abs(food.gridY-ant.gridY));
+    if(Math.abs(deltax)<=1&&Math.abs(deltay)<=1){
+        
+        System.out.println("FOOOOOOOOD"+ant.id);
+        for(Direction dir : Direction.values()){
+            if ( dir.deltaX()==deltax&&dir.deltaY()==deltay){
+                System.out.println("Pickup called");
+            action.type = AntActionType.PICKUP;
+                action.direction=dir;
+            System.out.println("Pickup called"+"-->"+dir.name()+":"+deltax+";"+deltay);
+            }
+        
+        }
+        
+        
+    }
+    else{
+        if(deltax>0)action.direction=Direction.EAST;
+        else if(deltax<0)action.direction=Direction.WEST;
+        else{
+            if(deltay<0)action.direction=Direction.NORTH;
+             if(deltay>0)action.direction=Direction.SOUTH;
+        }
+    
+       
+    
+}
+    
+    if(ant.carryType!=null){
+        int deltahomex=ant.gridX-centerX;
+        int deltahomey=ant.gridY-centerY;
+         if(deltahomex>0)action.direction=Direction.EAST;
+        else if(deltahomex<0)action.direction=Direction.WEST;
+        else{
+            if(deltahomey<0)action.direction=Direction.NORTH;
+             if(deltahomey>0)action.direction=Direction.SOUTH;
+        }
+         if(world.yourMap.get(ant.gridX).get(ant.gridY).terrain==LandType.NEST){
+         action.type=AntActionType.DROP;
+         }
+    
+    
+    }
+    
+    
+    
     return action;
   }
   
