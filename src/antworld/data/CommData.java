@@ -139,7 +139,7 @@ public class CommData implements Serializable
    */
   public String toString()
   {
-    String out = "CommData["+gameTick+":"+wallClockMilliSec+"]: "+ myNest + ", myTeam=" + myTeam+ "\n     ";
+    String out = "CommData["+serialVersionUID+":"+gameTick+":"+wallClockMilliSec+"]: "+ myNest + ", myTeam=" + myTeam+ "\n     ";
     if (errorMsg != null)
     { out = out + "**ERROR**: " + errorMsg + "\n     ";
     }

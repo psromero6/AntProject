@@ -1,15 +1,15 @@
-package antworld.client;
+package antworld.data;
 
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.MediaTracker;
 import java.awt.Point;
-import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +26,10 @@ public class Picture extends JFrame implements ComponentListener
   public static final String VERSION = "Picture() Version 2013.4.16";
   
   private int imageWidth, imageHeight;
-  private BufferedImage offScreenImage,savedImage;
+  private BufferedImage offScreenImage;
   private ComponentListener resizeListenter;
   private DrawPane drawPane;
-  public Double zoomLvl;
+  
   private boolean error = false;
   
   
@@ -46,7 +46,6 @@ public class Picture extends JFrame implements ComponentListener
   //==================================================================
   public Picture(int insideWidth, int insideHeight)
   {
-    zoomLvl=1.0;
     System.out.println(VERSION);
     this.setTitle(VERSION);
     
@@ -54,7 +53,6 @@ public class Picture extends JFrame implements ComponentListener
     imageHeight = insideHeight;
     offScreenImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
 
-    savedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
     
     this.setResizable(false);
     this.setVisible(true);
@@ -99,10 +97,8 @@ public class Picture extends JFrame implements ComponentListener
   
   void setupWindowWithImageFromFile(String path)
   {
-    zoomLvl=1.0;
-    
+
     offScreenImage = loadImage(path, this);
-    savedImage = loadImage(path, this);
     if (offScreenImage == null)
     { error = true; 
       return;
@@ -374,28 +370,50 @@ public class Picture extends JFrame implements ComponentListener
      //int w=drawPane.getWidth();
  //drawPane.setBounds(0,0,x+w,y+h);
 drawPane.setLocation(x, y);
- 
+ System.out.println("setCenter"+x+";"+y);
   
   }
-  public void refresh(){
-      offScreenImage.flush();
-   offScreenImage=savedImage;
-   repaint();
-  }
-  
- public void zoom(char ch,Point p){
+  public void resize(float zoomLevel){
+   /*   Insets inset = this.getInsets();
+      int frameWidth = this.getWidth();
+      int frameHeight = this.getHeight();
+      imageHeight = frameHeight - inset.top - inset.bottom;
+      imageWidth = frameWidth - inset.left - inset.right;
+      float newImageWidth = imageWidth * zoomLevel;
+      float newImageHeight = imageHeight * zoomLevel;
+      System.out.println(newImageWidth + ";" + newImageHeight);
+      offScreenImage = new BufferedImage((int) newImageWidth, (int) newImageHeight, BufferedImage.TYPE_INT_RGB);
+//offScreenImage.
+      drawPane.setBounds(0, 0, imageWidth, imageHeight);
+ */
       
-      if(ch=='i'){zoomLvl=zoomLvl*2;}
-      if(ch=='o'){zoomLvl=zoomLvl/2;System.out.println("zoomout"+zoomLvl);}
-      int zoomx=(int) Math.round(imageWidth*zoomLvl);
-      int zoomy=(int) Math.round(imageHeight*zoomLvl);
-     // System.out.println(zoomx+";"+zoomy+":"+zoomLvl);
-
-     // offScreenImage.flush();
-      //offScreenImage=getScaledImage(savedImage, zoomx, zoomy);
-    //  drawPane.setBounds(0,0,zoomx,zoomy);
-     //drawPane.setLocation(-p.x*zoomx,-p.y*zoomy);
-  //drawPane.repaint();
+      setupWindowWithImageFromFile("AntWorld.PNG");
+      BufferedImage before = offScreenImage;
+int w = before.getWidth();
+int h = before.getHeight();
+//image is reloaded to prevent a loss of detail.
+BufferedImage after = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+AffineTransform at = new AffineTransform();
+at.scale(zoomLevel, zoomLevel);
+AffineTransformOp scaleOp = 
+   new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+after = scaleOp.filter(before, after);
+     
+      
+      offScreenImage=after;
+      
+       //drawPane.setBounds(0, 0, 1920, 1080);
+     // System.out.println(w/2+","+ h/2);
+       //drawPane.setLocation(500, 700);
+    //This is the callback to class that created this Picture
+  //  resizeListenter.componentResized(arg0);
+  }
+  
+  public void moveImage(){
+  
+ // drawPane.
+  
+  
   }
   public Point getDrawPaneLocation(){
   
@@ -412,7 +430,7 @@ drawPane.setLocation(x, y);
     int frameWidth = this.getWidth();
     int frameHeight = this.getHeight();
     
-   // System.out.println("Picture::Resized ("+frameWidth+", "+frameHeight+")");
+    System.out.println("Picture::Resized ("+frameWidth+", "+frameHeight+")");
     imageHeight = frameHeight - inset.top - inset.bottom;
     imageWidth = frameWidth - inset.left - inset.right;
     
@@ -443,12 +461,4 @@ drawPane.setLocation(x, y);
       canvas.drawImage(offScreenImage, 0, 0, null);
     }
   }
-    private BufferedImage getScaledImage(BufferedImage srcImg, int w, int h){
-    BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
-    Graphics2D g2 = resizedImg.createGraphics();
-    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-    g2.drawImage(srcImg, 0, 0, w, h, null);
-    g2.dispose();
-    return resizedImg;
-}
 }

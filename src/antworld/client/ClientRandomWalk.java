@@ -169,7 +169,7 @@ public class ClientRandomWalk
       try
       {
         if (DEBUG) System.out.println("ClientRandomWalk: chooseActions: " + myNestName);
-System.out.println("the loop is working");
+
         chooseActionsOfAllAnts(data,antworld);
         
  
@@ -244,6 +244,7 @@ System.out.println("the loop is working");
   {
     for (AntData ant : commData.myAntList)
     {
+      
       AntAction action = chooseAction(commData, ant,antworld);
       ant.myAction = action;
     }
@@ -252,7 +253,7 @@ System.out.println("the loop is working");
   private AntAction chooseAction(CommData data, AntData ant,AntWorld world)
   {
     AntAction action = new AntAction(AntActionType.STASIS);
-    
+      AntAction lastAction=ant.myAction;
     if (ant.ticksUntilNextAction > 0) return action;
 
     if (ant.underground)
@@ -262,7 +263,8 @@ System.out.println("the loop is working");
       action.y = centerY - Constants.NEST_RADIUS + random.nextInt(2 * Constants.NEST_RADIUS);
       return action;
     }
-
+    
+    
     action.type = AntActionType.MOVE;
    // System.out.println(data.nestData.length);
   //  NestData nestData=data.nestData[myNestName.ordinal()];
@@ -289,8 +291,11 @@ System.out.println("the loop is working");
     
     
     action.direction = Direction.getRandomDir();
-    
-  FoodData food= (FoodData) data.foodSet.toArray()[0];
+   System.out.println("randomchoice"+lastAction.type);
+    action.direction = Direction.WEST;
+  FoodData food= null;
+  if (!data.foodSet.isEmpty()){
+      food =(FoodData) data.foodSet.toArray()[0];
   int deltax=ant.gridX-food.gridX;
         int deltay=ant.gridY-food.gridY;
        System.out.println("FoodCheck:"+Math.abs(food.gridX-ant.gridX)+";"+Math.abs(food.gridY-ant.gridY));
@@ -302,6 +307,7 @@ System.out.println("the loop is working");
                 System.out.println("Pickup called");
             action.type = AntActionType.PICKUP;
                 action.direction=dir;
+                
             System.out.println("Pickup called"+"-->"+dir.name()+":"+deltax+";"+deltay);
             }
         
@@ -320,17 +326,19 @@ System.out.println("the loop is working");
        
     
 }
-    
+  }
     if(ant.carryType!=null){
         int deltahomex=ant.gridX-centerX;
         int deltahomey=ant.gridY-centerY;
-         if(deltahomex>0)action.direction=Direction.EAST;
-        else if(deltahomex<0)action.direction=Direction.WEST;
+         if(deltahomex>0){action.direction=Direction.EAST;}
+        else if(deltahomex<0){action.direction=Direction.WEST;}
         else{
             if(deltahomey<0)action.direction=Direction.NORTH;
              if(deltahomey>0)action.direction=Direction.SOUTH;
+             
         }
          if(world.yourMap.get(ant.gridX).get(ant.gridY).terrain==LandType.NEST){
+             System.out.println("drop");
          action.type=AntActionType.DROP;
          }
     
@@ -338,7 +346,9 @@ System.out.println("the loop is working");
     }
     
     
+    if(lastAction.type==AntActionType.MOVE&&ant.carryType==null&&data.foodSet.isEmpty()){    if(lastAction.type==AntActionType.MOVE&&ant.carryType==null&&data.foodSet.isEmpty()){return ant.myAction;}
     
+return ant.myAction;}
     return action;
   }
   

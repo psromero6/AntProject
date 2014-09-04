@@ -4,17 +4,8 @@
  * and open the template in the editor.
  */
 
-package antworld.client;
+package antworld.data;
 
-
-import antworld.data.AntData;
-import antworld.data.AntType;
-import antworld.data.CommData;
-import antworld.data.FoodData;
-import antworld.data.NestData;
-import antworld.data.NestNameEnum;
-import antworld.data.TeamNameEnum;
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -51,12 +42,11 @@ public class AntWorld {
     public AntWorld(CommData data) throws IOException {
         scoutList = new ArrayList<AntData>();
         //Control comptrol=
-        //need to initalize global myMap
         yourMap=new Control().myMap;
        //globalNodeMap= buildMap(readImage());
        NestData myNest=new NestData(NestNameEnum.ACORN,TeamNameEnum.Buffalograss,0,0);//
-       ArrayList<NodeData> patrolNodeList =  getPatrolNodes(myNest.centerX, myNest.centerY,10);
-       gameBoard=new Picture("AntWorld.png");
+       ArrayList<antworld.data.NodeData> patrolNodeList =  getPatrolNodes(myNest.centerX, myNest.centerY,10);
+       gameBoard=new Picture("AntWorld.PNG");
        gameBoard.setResizable(true);
        gameBoard.setSize(1920,1080);
        //gameBoard.setLocation(0,0);
@@ -68,8 +58,12 @@ public class AntWorld {
        testAnt1.gridX=1175;
        scoutList.add(testAnt);
        scoutList.add(testAnt1);
-       draw(data);
-
+       for (AntData ant:scoutList){
+       drawAnt(ant.gridX,ant.gridY); 
+      
+       
+       
+       }
        
         
     gameBoard.addMouseWheelListener(new MouseWheelListener() {
@@ -77,9 +71,8 @@ public class AntWorld {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int notches=e.getWheelRotation();
-                
-                if(notches<0) {gameBoard.zoom('i',e.getPoint());}
-                if(notches>0) {gameBoard.zoom('o',e.getPoint());}
+                if(notches<0) {drawPaneResize(gameBoard,'u');}
+                if(notches>0) {drawPaneResize(gameBoard,'d');}
                 //gameBoard.setCenter(0,0);
             }
         });
@@ -88,13 +81,13 @@ public class AntWorld {
       Point startClick;
             @Override
             public void mouseClicked(MouseEvent e) {
-              // System.out.println("Click");
+               System.out.println("Click");
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
                 startClick=e.getPoint();
-             
+                System.out.println("StartClick:"+startClick);
             }
 
             @Override
@@ -104,12 +97,12 @@ public class AntWorld {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-               // System.out.println("Enter");
+                System.out.println("Enter");
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                //System.out.println("Exit");
+                System.out.println("Exit");
             }
     
     
@@ -123,7 +116,7 @@ public class AntWorld {
                 //Point pnt=getStart();
                 int x=e.getX();
                 int y=e.getY();
-               // System.out.println(x+";"+y);
+                System.out.println(x+";"+y);
                 gameBoard.setCenter(x-start.x,y-start.y);
             }
 
@@ -134,8 +127,8 @@ public class AntWorld {
             //start=e.getPoint();
                dpPoint=gameBoard.getDrawPaneLocation();
             start=new Point(e.getPoint().x-dpPoint.x,e.getPoint().y-dpPoint.y);
-           // System.out.println("start:   "+start);
-          //  System.out.println("gameBoard:   "+gameBoard.getDrawPaneLocation());
+            System.out.println("start:   "+start);
+            System.out.println("gameBoard:   "+gameBoard.getDrawPaneLocation());
             }
             
             public void setStart(MouseEvent e){
@@ -152,12 +145,22 @@ public class AntWorld {
     
     
     }
-
     
+    public static void drawPaneResize(Picture pic,char in){
+        if (in=='u') zoomLevel=zoomLevel * 2;
+        if (in=='d') zoomLevel=zoomLevel / 2;
+        
+        gameBoard.resize(zoomLevel);
+        //gameBoard.setupWindowWithImageFromFile("AntWorld.PNG");
+    gameBoard.setSize(1920,1080);
+   // gameBoard.setCenter(2500,-1250);
+            
+        //gameBoard.repaint();
+    }
     
     
     public static int[][] readImage() throws IOException{
-        File fle=new File("AntWorld.png");
+        File fle=new File("AntWorld.PNG");
         BufferedImage img= ImageIO.read(fle);
         Raster rstr=img.getData();
         int imagearray[][]=new int[rstr.getWidth()][rstr.getHeight()];
@@ -190,8 +193,8 @@ public class AntWorld {
 //    }
     
     
-        public ArrayList<NodeData> getPatrolNodes(int centerX,int centerY,int radius){
-            ArrayList<NodeData> patrolNodeList= new ArrayList<>();
+        public ArrayList<antworld.data.NodeData> getPatrolNodes(int centerX,int centerY,int radius){
+            ArrayList<antworld.data.NodeData> patrolNodeList= new ArrayList<>();
             for(int i=-radius;i<radius;i++){
             int j=radius-Math.abs(i);
             //myMap hasnt been declared yet.
@@ -201,68 +204,10 @@ public class AntWorld {
             return patrolNodeList;
         }
         
-        
-       
-        
-        public void draw(CommData data){
-gameBoard.refresh();
-//System.out.println("myAnts drawn");
-for (AntData ant:data.myAntList){
-       drawMyAnt(ant.gridX,ant.gridY); 
-      
-       
-       }
-for (AntData ant:data.enemyAntSet){
-    drawOtherAnt(ant.gridX,ant.gridY);
-    
-    
-}
-
-for (FoodData food:data.foodSet){
-    drawFood(food.gridX,food.gridY,food.foodType.getColor());
-    
-    
-}
-        
-        }
- public void drawFood(int x,int y,int argb){
-        int size=10;
-        int r = (argb)&0xFF;
-        int g = (argb>>8)&0xFF;
-        int b = (argb>>16)&0xFF;
-        
-        for(int i=0;i<size;i++){
-            for(int j=0;j<size;j++){
-                
-                //gameBoard.setColor(x, y, color);
-             gameBoard.setRGB(x+i-size, y+j-size, r, g, b);
-            }
-        }
-        
-        }
-        
-        
-        public void drawOtherAnt(int x,int y){
+        public void drawAnt(int x,int y){
         int size=10;
         for(int i=0;i<size;i++){
             for(int j=0;j<size;j++){
-                
-             gameBoard.setRGB(x+i-size, y+j-size, 0, 0, 0);
-            }
-        }
-        
-        }
-        
-        
-        
-        
-        
-        
-        public void drawMyAnt(int x,int y){
-        int size=5;
-        for(int i=0;i<size;i++){
-            for(int j=0;j<size;j++){
-                //int blue=gameBoard.getBlue(x+i-size, y+j-size);
              gameBoard.setRGB(x+i-size, y+j-size, 255, 255, 255);
             }
         }

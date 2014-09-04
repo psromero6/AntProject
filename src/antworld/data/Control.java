@@ -1,6 +1,6 @@
-package antworld.client;
+package antworld.data;
 
-import antworld.data.LandType;
+import antworld.data.NodeData;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -33,7 +32,7 @@ public class Control
   
   public static void readImage()
   {
-    File fle = new File("AntWorld.png");
+    File fle = new File("AntWorld.PNG");
     //BufferedImage img;
     try
     {
@@ -59,7 +58,7 @@ public class Control
         rstr.getPixel(col, row, pixelData);//accessing image as (col,row) like (x,y), but access map as (row,col) like a matrix
         if(pixelData[0]==waterData[0]&&pixelData[1]==waterData[1]&&pixelData[2]==waterData[2])
         {
-          NodeData tempNode=new NodeData(row,col,LandType.WATER.getMapColor());//impassable terrain, water
+          NodeData tempNode=new NodeData(row,col,Integer.MAX_VALUE);//impassable terrain, water
           tempNodeArr.add(tempNode);
         }
         else
