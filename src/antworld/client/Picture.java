@@ -3,9 +3,11 @@ package antworld.client;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.MediaTracker;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
@@ -26,10 +28,10 @@ public class Picture extends JFrame implements ComponentListener
   public static final String VERSION = "Picture() Version 2013.4.16";
   
   private int imageWidth, imageHeight;
-  private BufferedImage offScreenImage;
+  private BufferedImage offScreenImage,savedImage;
   private ComponentListener resizeListenter;
   private DrawPane drawPane;
-  
+  public Double zoomLvl;
   private boolean error = false;
   
   
@@ -46,6 +48,8 @@ public class Picture extends JFrame implements ComponentListener
   //==================================================================
   public Picture(int insideWidth, int insideHeight)
   {
+    zoomLvl=1.0;
+    savedImage=offScreenImage;
     System.out.println(VERSION);
     this.setTitle(VERSION);
     
@@ -97,7 +101,8 @@ public class Picture extends JFrame implements ComponentListener
   
   void setupWindowWithImageFromFile(String path)
   {
-
+    zoomLvl=1.0;
+    savedImage=offScreenImage;
     offScreenImage = loadImage(path, this);
     if (offScreenImage == null)
     { error = true; 
@@ -409,11 +414,19 @@ after = scaleOp.filter(before, after);
   //  resizeListenter.componentResized(arg0);
   }
   
-  public void moveImage(){
-  
- // drawPane.
-  
-  
+ public void zoom(char ch,Point p){
+      
+      if(ch=='i'){zoomLvl=zoomLvl*2;}
+      if(ch=='o'){zoomLvl=zoomLvl/2;System.out.println("zoomout"+zoomLvl);}
+      int zoomx=(int) Math.round(imageWidth*zoomLvl);
+      int zoomy=(int) Math.round(imageHeight*zoomLvl);
+      System.out.println(zoomx+";"+zoomy+":"+zoomLvl);
+
+      offScreenImage.flush();
+      offScreenImage=getScaledImage(savedImage, zoomx, zoomy);
+      drawPane.setBounds(0,0,zoomx,zoomy);
+     drawPane.setLocation(-p.x*zoomx,-p.y*zoomy);
+  drawPane.repaint();
   }
   public Point getDrawPaneLocation(){
   
@@ -461,4 +474,12 @@ after = scaleOp.filter(before, after);
       canvas.drawImage(offScreenImage, 0, 0, null);
     }
   }
+    private BufferedImage getScaledImage(BufferedImage srcImg, int w, int h){
+    BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
+    Graphics2D g2 = resizedImg.createGraphics();
+    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    g2.drawImage(srcImg, 0, 0, w, h, null);
+    g2.dispose();
+    return resizedImg;
+}
 }
