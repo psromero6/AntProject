@@ -6,6 +6,7 @@
 
 package antworld.data;
 
+import antworld.client.Picture;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -150,7 +151,7 @@ public class AntWorld {
         if (in=='u') zoomLevel=zoomLevel * 2;
         if (in=='d') zoomLevel=zoomLevel / 2;
         
-        gameBoard.resize(zoomLevel);
+        
         //gameBoard.setupWindowWithImageFromFile("AntWorld.PNG");
     gameBoard.setSize(1920,1080);
    // gameBoard.setCenter(2500,-1250);

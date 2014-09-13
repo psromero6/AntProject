@@ -2,8 +2,6 @@ package antworld.client;
 
 
 
-import antworld.data.LandType;
-import java.awt.Color;
 import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.Referenceable;
@@ -17,7 +15,6 @@ public class NodeData
   private int h_heuristic;
   private int g_movecost;
   private int f_value;
-  public LandType terrain;
   
   private int elevation;//included for printing purposes
   //private boolean startLoc=false;
@@ -25,16 +22,12 @@ public class NodeData
   private NodeData parentNode;
   private NodeData tentativeParentNode;
   
-  public NodeData(int row, int col, int color)
+  public NodeData(int row, int col, int green)
   {
     //TODO are these in the right order (row,col)?
    rowID=row;
    colID=col;
-   elevation= (color>>8)&0xFF;
-   if(color==LandType.WATER.getMapColor())terrain=LandType.WATER;
-   else if(color==LandType.NEST.getMapColor())terrain=LandType.NEST;
-   else terrain=LandType.GRASS;
-   
+   elevation=green;
   }
   
   public void setParent(NodeData child)
@@ -69,7 +62,7 @@ public class NodeData
     return base_movecost;
   }
   
-  public void calcG(NodeData startLoc, NodeData goalLoc)//will require access to parent node
+  public void calcG(NodeData startLoc)//will require access to parent node
   {
     int base_movecost=calcBase_Movecost(startLoc);
     //check for null parent
