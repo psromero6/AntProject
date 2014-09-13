@@ -123,7 +123,8 @@ public class ClientRandomWalk
             {
             }
 
-            NestNameEnum requestedNest = NestNameEnum.values()[random.nextInt(NestNameEnum.SIZE)];
+            //NestNameEnum requestedNest = NestNameEnum.values()[random.nextInt(NestNameEnum.SIZE)];
+            NestNameEnum requestedNest = NestNameEnum.BULLET;
             CommData data = new CommData(requestedNest, myTeam);
             data.password = password;
 
@@ -311,15 +312,15 @@ public class ClientRandomWalk
         if (ant.underground)
         {
             System.out.println("Climbing out   "+ant.id);
-            //initalizing the queque with explore sequence
+            //initalizing the queque
+            
+           
             action = scatter(ant.id);
- 
-           for(int i=0;i<50;i++){ 
+            
+            
+           for(int i=0;i<100;i++){ 
                myActionQueue.add(action);
            }
-           
-           
-           
            AntAction exitAction= new AntAction(AntActionType.EXIT_NEST);
             exitAction.x = centerX - Constants.NEST_RADIUS + random.nextInt(2 * Constants.NEST_RADIUS);
             exitAction.y = centerY - Constants.NEST_RADIUS + random.nextInt(2 * Constants.NEST_RADIUS);
@@ -354,7 +355,7 @@ public class ClientRandomWalk
         return action;
     }
 
-    //quick and dirty go to. when we get there we exicute dowhat Action. this will die soon
+    //quick and dirty go to. when we get there we exicute dowhat.
     public AntAction goToShitty(AntData ant, int x, int y,AntActionType dowhat,int quant){
         AntAction action= new AntAction(AntActionType.MOVE);
     if((Math.abs(ant.gridX-x)+Math.abs(ant.gridY-y))==1){
@@ -411,8 +412,7 @@ public class ClientRandomWalk
     
     
     }
-    //sets new move action to the last action done by this ant
-    //this is usefull for random scattering at a long distance.
+    
     public AntAction randomTrack(AntData ant){
     AntAction action= new AntAction(AntActionType.MOVE);
     if(ant.myAction.type==AntActionType.STASIS){
