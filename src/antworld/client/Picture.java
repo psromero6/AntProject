@@ -99,6 +99,7 @@ public class Picture extends JFrame implements ComponentListener
   
   void setupWindowWithImageFromFile(String path)
   {
+      //Hard Coded zoomLvl. I would like a dynamic variable soon.
     zoomLvl=0.25;
     
     offScreenImage = scaleImage(loadImage(path, this),zoomLvl);
