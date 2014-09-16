@@ -228,7 +228,7 @@ public class ClientRandomWalk
         {
           System.out.println("ClientRandomWalk: listening to socket....");
         }
-        System.out.println(data.gameTick+";"+data.foodStockPile[0]+";"+data.foodStockPile[1]+";"+data.foodStockPile[2]+";"+data.foodStockPile[3]);
+        System.out.println(data.gameTick+";"+data.foodStockPile[1]+";"+data.foodStockPile[2]+";"+data.foodStockPile[3]+";"+data.foodStockPile[4]+";"+data.foodStockPile[5]);
         CommData recivedData = (CommData) inputStream.readObject();
         if (DEBUG)
         {
