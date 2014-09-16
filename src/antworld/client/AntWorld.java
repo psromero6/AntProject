@@ -56,70 +56,32 @@ public class AntWorld
         yourMap = new Control().myMap;
         //globalNodeMap= buildMap(readImage());
         NestData myNest = new NestData(NestNameEnum.ACORN, TeamNameEnum.Buffalograss, 0, 0);//
-        ArrayList<NodeData> patrolNodeList = getPatrolNodes(myNest.centerX, myNest.centerY, 10);
-        gameBoard = new Picture("AntWorld.png");
+        gameBoard=new Picture("AntWorld.PNG");
         gameBoard.setResizable(true);
-        gameBoard.setSize(1920, 1080);
-        //gameBoard.setLocation(0,0);
+        gameBoard.setSize(gameBoard.getImageWidth()/2,gameBoard.getImageHeight()/2);
 
 
-        gameBoard.addMouseWheelListener(new MouseWheelListener()
-        {
+//        gameBoard.addMouseWheelListener(new MouseWheelListener()
+//        {
+//
+//            @Override
+//            public void mouseWheelMoved(MouseWheelEvent e)
+//            {
+//                int notches = e.getWheelRotation();
+//
+//                if (notches < 0)
+//                {
+//                    gameBoard.zoom('i', e.getPoint());
+//                }
+//                if (notches > 0)
+//                {
+//                    gameBoard.zoom('o', e.getPoint());
+//                }
+//                //gameBoard.setCenter(0,0);
+//            }
+//        });
 
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e)
-            {
-                int notches = e.getWheelRotation();
-
-                if (notches < 0)
-                {
-                    gameBoard.zoom('i', e.getPoint());
-                }
-                if (notches > 0)
-                {
-                    gameBoard.zoom('o', e.getPoint());
-                }
-                //gameBoard.setCenter(0,0);
-            }
-        });
-
-        gameBoard.addMouseListener(new MouseListener()
-        {
-            Point startClick;
-
-            @Override
-            public void mouseClicked(MouseEvent e)
-            {
-                // System.out.println("Click");
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e)
-            {
-                startClick = e.getPoint();
-                //System.out.println("StartClick:"+startClick);
-               
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e)
-            {
-                //ispressed=false;
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e)
-            {
-                // System.out.println("Enter");
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e)
-            {
-                //System.out.println("Exit");
-            }
-
-        });
+        
 
         gameBoard.addMouseMotionListener(new MouseMotionListener()
         {
@@ -129,35 +91,20 @@ public class AntWorld
             @Override
             public void mouseDragged(MouseEvent e)
             {
-                //Point pnt=getStart();
                 int x = e.getX();
                 int y = e.getY();
-                // System.out.println(x+";"+y);
                 gameBoard.setCenter(x - start.x, y - start.y);
             }
 
             @Override
             public void mouseMoved(MouseEvent e)
             {
-                //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
-                //start=e.getPoint();
                 dpPoint = gameBoard.getDrawPaneLocation();
                 start = new Point(e.getPoint().x - dpPoint.x, e.getPoint().y - dpPoint.y);
-           // System.out.println("start:   "+start);
-                //  System.out.println("gameBoard:   "+gameBoard.getDrawPaneLocation());
-            }
-
-            public void setStart(MouseEvent e)
-            {
 
             }
 
-            public Point getStart(MouseEvent e)
-            {
-
-                return new Point();
-            }
 
         });
 
@@ -165,24 +112,7 @@ public class AntWorld
 
    
 
-    public static void drawPaneResize(Picture pic, char in)
-    {
-        if (in == 'u')
-        {
-            zoomLevel = zoomLevel * 2;
-        }
-        if (in == 'd')
-        {
-            zoomLevel = zoomLevel / 2;
-        }
 
-       // gameBoard.resize(zoomLevel);
-        //gameBoard.setupWindowWithImageFromFile("AntWorld.PNG");
-        gameBoard.setSize(1920, 1080);
-   // gameBoard.setCenter(2500,-1250);
-
-        //gameBoard.repaint();
-    }
 
     public static int[][] readImage() throws IOException
     {
@@ -206,38 +136,12 @@ public class AntWorld
 
     }
 
-//    public static NodeDaty[][] buildMap(int[][] intMap){
-//        int l=intMap.length;
-//        int w=intMap[0].length;
-//        Node[][] nodeMap=new Node[l][intMap[0].length];
-//        for(int i=0;i<l;i++){
-//            for(int j=0;j<w;j++){
-//             nodeMap[i][j]=new Node(i,j,intMap[i][j]);
-//            }
-//        }
-//    
-//    return nodeMap;
-//    }
-    public ArrayList<NodeData> getPatrolNodes(int centerX, int centerY, int radius)
-    {
-        ArrayList<NodeData> patrolNodeList = new ArrayList<>();
-        for (int i = -radius; i < radius; i++)
-        {
-            int j = radius - Math.abs(i);
-            //myMap hasnt been declared yet.
-            if (i > -1 && j > -1)
-            {
-                patrolNodeList.add(yourMap.get(j).get(i));
-            }
 
-        }
-        return patrolNodeList;
-    }
 
     public void draw(CommData data)
     {
 
-        gameBoard.refresh();
+        gameBoard.refresh("AntWorld.png");
         for (AntData ant : data.myAntList)
         {
             drawMyAnt(ant.gridX, ant.gridY);
@@ -259,7 +163,7 @@ public class AntWorld
 
     public void drawFood(int x, int y, int argb)
     {
-        int size = 10;
+        int size = 4;
         int r = (argb) & 0xFF;
         int g = (argb >> 8) & 0xFF;
         int b = (argb >> 16) & 0xFF;
@@ -278,7 +182,7 @@ public class AntWorld
 
     public void drawOtherAnt(int x, int y)
     {
-        int size = 10;
+        int size = 4;
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -292,7 +196,7 @@ public class AntWorld
 
     public void drawMyAnt(int x, int y)
     {
-        int size = 10;
+        int size = 4;
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)

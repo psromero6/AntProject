@@ -137,7 +137,7 @@ public class ClientRandomWalk
 
           if (DEBUG)
           {
-            System.out.println("ClientRandomWalk: listening to socket....");
+            System.out.println("ClientRandomWalk: listening to socket...."+inputStream.toString());
           }
           CommData recvData = (CommData) inputStream.readObject();
 
