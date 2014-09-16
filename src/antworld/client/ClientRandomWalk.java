@@ -1,5 +1,6 @@
 package antworld.client;
 
+import static antworld.client.AntWorld.gameBoard;
 import static antworld.client.AntWorld.readImage;
 import antworld.client.DistanceCompare;
 import antworld.data.AntAction;
@@ -12,6 +13,9 @@ import antworld.data.Direction;
 import antworld.data.FoodData;
 import antworld.data.NestNameEnum;
 import antworld.data.TeamNameEnum;
+import java.awt.event.KeyEvent;
+import static java.awt.event.KeyEvent.VK_X;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,7 +29,7 @@ import java.util.Random;
 
 public class ClientRandomWalk
 {
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = true;
   private static final boolean DRAW = false;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
@@ -292,6 +296,7 @@ public class ClientRandomWalk
 
   private void chooseActionsOfAllAnts(CommData data)
   {
+      if(data.foodStockPile[0]<350) collectWater=true;
     for (AntData ant : data.myAntList)
     {
       commandAnts.updateActionQueue(ant);
@@ -533,6 +538,30 @@ public class ClientRandomWalk
     }
 
     myClient = new ClientRandomWalk(serverHost, Constants.PORT);
+          gameBoard.addKeyListener(new KeyListener(){
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+              
+if(e.isControlDown()&&e.getKeyCode()==VK_X)      myClient.closeAll();
+// throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+               // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+              //  throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        
+        
+        
+        });
+        
+ 
   }
 
   public int getCenterX()

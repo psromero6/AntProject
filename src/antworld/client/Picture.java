@@ -104,8 +104,8 @@ public class Picture extends JFrame implements ComponentListener
 
     zoomLvl=0.25;
     
-    offScreenImage = scaleImage(loadImage(path, this),zoomLvl);
-    savedImage = scaleImage(loadImage(path, this),zoomLvl);
+    offScreenImage =loadImage(path, this);// scaleImage(loadImage(path, this),zoomLvl);
+    savedImage = loadImage(path, this);//scaleImage(loadImage(path, this),zoomLvl);
     if (offScreenImage == null)
     { error = true; 
       return;

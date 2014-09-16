@@ -14,6 +14,9 @@ import antworld.data.NestNameEnum;
 import antworld.data.TeamNameEnum;
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import static java.awt.event.KeyEvent.VK_X;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -60,6 +63,10 @@ public class AntWorld
         gameBoard.setResizable(true);
         gameBoard.setSize(gameBoard.getImageWidth()/2,gameBoard.getImageHeight()/2);
 
+        
+        
+        
+        
 
 //        gameBoard.addMouseWheelListener(new MouseWheelListener()
 //        {
