@@ -10,7 +10,6 @@ import antworld.data.AntAction.AntActionType;
 import antworld.data.AntData;
 import antworld.data.CommData;
 import antworld.data.Direction;
-import antworld.data.NestData;
 import antworld.data.NestNameEnum;
 import java.util.ArrayList;
 import java.util.HashMap;
