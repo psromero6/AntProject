@@ -27,7 +27,7 @@ public class Picture extends JFrame implements ComponentListener
   public static final String VERSION = "Picture() Version 2013.4.16";
   
   private int imageWidth, imageHeight;
-  private BufferedImage offScreenImage,savedImage;
+  private BufferedImage offScreenImage;//,savedImage;
 
   private DrawPane drawPane;
   public Double zoomLvl;
@@ -54,7 +54,7 @@ public class Picture extends JFrame implements ComponentListener
     imageWidth = (int) (insideWidth/zoomLvl);
     imageHeight = (int) (insideHeight/zoomLvl);
     offScreenImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-    savedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+   // savedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
     
     this.setResizable(false);
     this.setVisible(true);
@@ -102,10 +102,10 @@ public class Picture extends JFrame implements ComponentListener
   void setupWindowWithImageFromFile(String path)
   {
 
-    zoomLvl=0.25;
+    zoomLvl=1.0;
     
-    offScreenImage =loadImage(path, this);// scaleImage(loadImage(path, this),zoomLvl);
-    savedImage = loadImage(path, this);//scaleImage(loadImage(path, this),zoomLvl);
+    offScreenImage =scaleImage(loadImage(path, this),zoomLvl);
+   // savedImage =scaleImage(loadImage(path, this),zoomLvl);
     if (offScreenImage == null)
     { error = true; 
       return;
@@ -124,7 +124,7 @@ public class Picture extends JFrame implements ComponentListener
     drawPane = new DrawPane();
    
     contantPane.add(drawPane);
-    
+    System.out.println("passed this point");
     
     addSpaceToFrameForBoarder();
   }
@@ -329,6 +329,8 @@ public class Picture extends JFrame implements ComponentListener
   //=========================================================================
   public void setRGB(int x, int y, int r, int g, int b)
   {
+      x=(int) (x*zoomLvl);
+      y=(int) (y*zoomLvl);
     if (x<0) return;
     if (y<0) return;
     if (x>imageWidth) {System.out.println("x:"+x+" out:"+imageWidth);return;}
@@ -385,7 +387,7 @@ drawPane.setLocation(x, y);
   public void refresh(String path){
    offScreenImage.flush();
     
-   offScreenImage.setData(savedImage.getRaster());
+  // offScreenImage.setData(savedImage.getRaster());
    repaint();
   }
   

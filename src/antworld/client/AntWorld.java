@@ -59,7 +59,7 @@ public class AntWorld
         yourMap = new Control().myMap;
         //globalNodeMap= buildMap(readImage());
         NestData myNest = new NestData(NestNameEnum.ACORN, TeamNameEnum.Buffalograss, 0, 0);//
-        gameBoard=new Picture("AntWorld.PNG");
+        gameBoard=new Picture("AntWorld.png");
         gameBoard.setResizable(true);
         gameBoard.setSize(gameBoard.getImageWidth()/2,gameBoard.getImageHeight()/2);
 

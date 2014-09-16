@@ -4,13 +4,11 @@ import antworld.data.CommData;
 import antworld.data.NestNameEnum;
 import antworld.data.TeamNameEnum;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

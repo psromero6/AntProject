@@ -182,10 +182,11 @@ public class ClientRandomWalk
     {
       antworld = new AntWorld(data);
     }
+     System.out.println("controlStart");
     Control myControl = new Control();//this populates the map in control, which is reffered to in goto and actionqueue
-
+ System.out.println("controlStop");
     commandAnts = new ActionQueue(data);
-
+ System.out.println("actionlQueque made");
     //antworld.setLocation(centerX, centerX);
     //testing with initalizing actions psr
     AntAction action = new AntAction(AntActionType.STASIS);
@@ -202,12 +203,14 @@ public class ClientRandomWalk
     // drawAnts(data);
     while (true)
     {
-      if (DRAW)
+      if (DRAW&&(data.gameTick%5==0))
       {
+          System.out.println("draw");
         antworld.draw(data);
       }
       try
       {
+           System.out.println("loop");
         if (DEBUG)
         {
           System.out.println("ClientRandomWalk: chooseActions: " + myNestName);
@@ -225,7 +228,7 @@ public class ClientRandomWalk
         {
           System.out.println("ClientRandomWalk: listening to socket....");
         }
-        System.out.println(data.gameTick);
+        System.out.println(data.gameTick+";"+data.foodStockPile[0]+";"+data.foodStockPile[1]+";"+data.foodStockPile[2]+";"+data.foodStockPile[3]);
         CommData recivedData = (CommData) inputStream.readObject();
         if (DEBUG)
         {
@@ -296,7 +299,7 @@ public class ClientRandomWalk
 
   private void chooseActionsOfAllAnts(CommData data)
   {
-      if(data.foodStockPile[0]<350) collectWater=true;
+     // if(data.foodStockPile[0]<350) collectWater=true;
     for (AntData ant : data.myAntList)
     {
       commandAnts.updateActionQueue(ant);
@@ -315,6 +318,7 @@ public class ClientRandomWalk
     }
     if(collectWater)//change this to if(base has less than 200 water)
     {
+        System.out.println("getting water");
       ArrayList<AntData> antListToCollectWater=new ArrayList<AntData>();
       NodeData closestWaterNode=Control.myMap.get(2382).get(2064);//consider making this an algorithm, this is closest to Bullet base
       ArrayList<AntData> mySortedAntList=data.myAntList;//
@@ -425,6 +429,7 @@ public class ClientRandomWalk
       //   System.out.println(Math.abs(f.gridX-ant.gridX)+Math.abs(f.gridY-ant.gridY));
       if (Math.abs(f.gridX - ant.gridX) + Math.abs(f.gridY - ant.gridY) < 200)
       {
+          System.out.println("food seen");
         AntAction currentQuest = commandAnts.questMapping.get(ant.id);//if the ant is within 200 units of foos AND its current action is not to go get that, then build and action list to do so
         
         if (currentQuest==null)

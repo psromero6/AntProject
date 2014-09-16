@@ -37,7 +37,7 @@ public class ActionQueue
         int i = 0;
         for (AntData myAntData : myComm.myAntList)
         {
-            LinkedList antActionQueue = new LinkedList<AntAction>();//each ant will have a queue of actions to take. we want it to work like a queue, except that we wont "pop"
+            LinkedList antActionQueue = new LinkedList<>();//each ant will have a queue of actions to take. we want it to work like a queue, except that we wont "pop"
             //the queue until we get confirmation that the previous move happened.
             antList.add(myAntData.id);
             commandMap.put(myAntData.id, antActionQueue);
@@ -124,6 +124,8 @@ public class ActionQueue
     }
     adjFoodRow=adjFoodRow+(stepOrthFromFood*yDirection);
     adjFoodCol=adjFoodCol+(stepOrthFromFood*xDirection);
+    if(adjFoodRow<0)adjFoodRow=0;
+    if(adjFoodCol<0)adjFoodCol=0;
     adjFoodNode=Control.myMap.get(adjFoodRow).get(adjFoodCol);
     
     //\\fourth and final, ADD moveList to return to nest
@@ -147,8 +149,8 @@ public class ActionQueue
    {
     int currentRow = ant.gridY;
     int currentCol = ant.gridY;
-    int homeRow = ClientRandomWalk.myClient.getCenterY();
-    int homeCol = ClientRandomWalk.myClient.getCenterX();
+    int homeRow = centerY;
+    int homeCol = centerX;
     NodeData currentNode=Control.myMap.get(currentRow).get(currentCol);
     NodeData homeNode=Control.myMap.get(homeRow).get(homeCol);
     AntAction currentQuest=new AntAction(AntActionType.HEAL);
