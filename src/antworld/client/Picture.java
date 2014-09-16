@@ -84,7 +84,9 @@ public class Picture extends JFrame implements ComponentListener
     setupWindowWithImageFromFile(userFilePath);
   }
   
-  
+  public void testfunction(){
+
+}
   //==================================================================
   //Constructor expects to be given an image path.
   //  The path can either be absolute or relative
