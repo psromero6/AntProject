@@ -385,7 +385,7 @@ public class ClientRandomWalk
       {
         System.out.println("gotofood");
         AntAction currentQuest = commandAnts.questMapping.get(ant.id);//if the ant is within 200 units of foos AND its current action is not to go get that, then build and action list to do so
-        if (currentQuest!=currentQuest.type != AntActionType.PICKUP)
+        if (currentQuest.type != AntActionType.PICKUP)
         {
           NodeData foodNode=Control.myMap.get(f.gridY).get(f.gridX);
           commandAnts.collectFood(ant, foodNode);//builds a list of actions to go get food and return with it
