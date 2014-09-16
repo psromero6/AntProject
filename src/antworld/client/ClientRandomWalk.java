@@ -1,6 +1,7 @@
 package antworld.client;
 
 import static antworld.client.AntWorld.readImage;
+import antworld.client.DistanceCompare;
 import antworld.data.AntAction;
 import antworld.data.AntAction.AntActionType;
 import antworld.data.AntData;
@@ -19,13 +20,13 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 
 public class ClientRandomWalk
 {
-
   private static final boolean DEBUG = false;
   private static final boolean DRAW = false;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
@@ -36,6 +37,7 @@ public class ClientRandomWalk
   private ObjectInputStream inputStream = null;
   private ObjectOutputStream outputStream = null;
   private boolean isConnected = false;
+  private boolean collectWater= true;
   private NestNameEnum myNestName = null;
   private int centerX, centerY;
 
@@ -115,7 +117,6 @@ public class ClientRandomWalk
 
   public CommData chooseNest()
   {
-      System.out.println("ChooseNest");
     while (myNestName == null)
     {
       try
@@ -175,7 +176,7 @@ public class ClientRandomWalk
   public void mainGameLoop(CommData data) throws IOException
   {
     System.out.println("mainGameLoop");
-    if (DRAW )
+    if (DRAW)
     {
       antworld = new AntWorld(data);
     }
@@ -199,7 +200,7 @@ public class ClientRandomWalk
     // drawAnts(data);
     while (true)
     {
-      if (DRAW&& (data.gameTick%5==0))
+      if (DRAW)
       {
         antworld.draw(data);
       }
@@ -301,6 +302,36 @@ public class ClientRandomWalk
       //  System.out.println(action.type+";"+action.direction);
       ant.myAction = action;
     }
+    if(collectWater)//change this to if(base has less than 200 water)
+    {
+      ArrayList<AntData> antListToCollectWater=new ArrayList<AntData>();
+      NodeData closestWaterNode=Control.myMap.get(2382).get(2064);//consider making this an algorithm, this is closest to Bullet base
+      ArrayList<AntData> mySortedAntList=data.myAntList;//
+      DistanceCompare myDistComp=new DistanceCompare();//SET the compare node in this class!!!      
+      int numberOfAntsToCollectWater=10;
+      myDistComp.goalNode=closestWaterNode;//now it is set
+      
+      Collections.sort(mySortedAntList,myDistComp);//sortedAntList now sorted
+      
+      while(antListToCollectWater.size()<0)
+      {
+        antListToCollectWater.remove(0);//make sure ant list is empty before beginning
+      }
+      for(int i=0;i<numberOfAntsToCollectWater;i++)
+      {
+        antListToCollectWater.add(mySortedAntList.get(i));
+      }
+      if(antListToCollectWater.size()!=numberOfAntsToCollectWater)
+      {
+        System.out.println("wrong number of ants to collect water");
+      }
+      //now we have 10 ants closest to water
+      for (AntData ant : antListToCollectWater)
+      {
+        commandAnts.collectFood(ant,closestWaterNode);//tells the ants to collect the water
+      }
+      collectWater=false;
+    }
   }
 
   private AntAction chooseAction(CommData data, AntData ant)
@@ -383,15 +414,16 @@ public class ClientRandomWalk
       //   System.out.println(Math.abs(f.gridX-ant.gridX)+Math.abs(f.gridY-ant.gridY));
       if (Math.abs(f.gridX - ant.gridX) + Math.abs(f.gridY - ant.gridY) < 200)
       {
-        System.out.println("gotofood");
         AntAction currentQuest = commandAnts.questMapping.get(ant.id);//if the ant is within 200 units of foos AND its current action is not to go get that, then build and action list to do so
-        if (currentQuest.type != AntActionType.PICKUP)
+        
+        if (currentQuest==null)
         {
+          System.out.println("starting food quest");
           NodeData foodNode=Control.myMap.get(f.gridY).get(f.gridX);
           commandAnts.collectFood(ant, foodNode);//builds a list of actions to go get food and return with it
           break;//break in case an ant is within 200 units of multiple food sources, it'll just go to the first on on the list
-        }        
-//        1return goToShitty(ant, f.gridX, f.gridY, AntActionType.PICKUP, Math.min(ant.carryUnits, myFoodArray[0].getCount()));
+        }
+        //else keep doing the quest you were doing
       }
     }
     
@@ -400,79 +432,29 @@ public class ClientRandomWalk
       if ((commandAnts.questMapping.get(ant.id).type == AntActionType.PICKUP))//if that quest was to pick up food
       {
         //then follow the actions is the list to go get the food
-        System.out.println("ant"+ant.id+" following path to food");
+        //System.out.println("ant"+ant.id+" following path to food");
         LinkedList<AntAction> actionList = commandAnts.commandMap.get(ant.id);
-        AntAction nextActionFromList = actionList.getFirst();//after list is built, get the first action on that list
-        actionList.removeFirst();
+        //System.out.println("size of ants action list:"+actionList.size());
+        AntAction nextActionFromList = actionList.pop();//after list is built, get the first action on that list
         return nextActionFromList;
       }
-    }
+    }   
+    
     
     //myActionQueue = commandAnts.commandMap.get(ant.id);//returns actionQueue
     //commandAnts.updateActionQueue(ant);
     //System.out.println("actions remaining for ant" +ant.id+" ="+myActionQueue.size()+"   counter:"+data.wallClockMilliSec);//debug
-    if (myActionQueue.isEmpty())
+    if (myActionQueue.isEmpty() || ant.myAction.type == AntActionType.STASIS)
     {
-        System.out.println("randomTrack");
       return randomTrack(ant);
     } else
     {
       action = myActionQueue.getFirst();
       myActionQueue.removeFirst();
-      System.out.println("actionlistItem:" + action.type + "  " + action.direction);
+      //System.out.println("actionlistItem:" + action.type + "  " + action.direction);
     }
 
     return action;
-  }
-
-  
-  public void explore(AntData ant,LinkedList<AntAction> actionQueue){
-  System.out.println("explore");
-      AntAction action=scatter(ant.id);
-      
-      
-      if(actionQueue.isEmpty()){
-        for (int i = 0; i < 100; i++)
-        {
-          actionQueue.add(action);
-        }
-      }
-      else{
-          ant.myAction=randomTrack(ant);
-      }
-  
-  }
-  
-  //quick and dirty go to. when we get there we exicute dowhat.
-  public AntAction goToShitty(AntData ant, int x, int y, AntActionType dowhat, int quant)
-  {
-    AntAction nextActionOnList = new AntAction(AntActionType.MOVE);
-    Control.myMap.get(y).get(x);//row, column
-    boolean onAQuest = false;
-    LinkedList<AntAction> antActionList;
-    antActionList = commandAnts.commandMap.get(ant.id);
-    if (antActionList.size() < 1)
-    {
-      onAQuest = false;
-    }
-    if(antActionList.size()>0)
-    {
-      onAQuest=true;
-    }
-
-    if (!onAQuest)
-    {      
-      NodeData goalNode = Control.myMap.get(y).get(x);
-
-      antActionList = commandAnts.collectFood(ant, goalNode);
-      onAQuest = true;
-    }
-
-    nextActionOnList = antActionList.getFirst();
-    antActionList.removeFirst();
-
-    System.out.println(nextActionOnList.direction);
-    return nextActionOnList;
   }
 
   //takes the id of an ant and returns a move action that assigns the direction
@@ -482,7 +464,7 @@ public class ClientRandomWalk
   {
     AntAction action = new AntAction(AntActionType.MOVE);
     int modid = id % 8;
-System.out.println(modid);
+
     switch (modid)
     {
       case 1:

@@ -10,6 +10,8 @@ import antworld.data.AntAction.AntActionType;
 import antworld.data.AntData;
 import antworld.data.CommData;
 import antworld.data.Direction;
+import antworld.data.NestData;
+import antworld.data.NestNameEnum;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,10 +26,15 @@ public class ActionQueue
     public ArrayList<Integer> antList = new ArrayList<Integer>();//arrayList of AntData.id
     public HashMap<Integer, LinkedList<AntAction>> commandMap = new HashMap<Integer, LinkedList<AntAction>>();
     public HashMap<Integer, AntAction> questMapping=new HashMap<Integer, AntAction>();//this mapping will tell us what quest an ant is currently on //AntAction.HEAL if returning to heak, AntAction.PICKUP if going to collect food etc.
+    public final int centerX, centerY;
+
     //need a way to add remove queues and ants if they are born or if they die
 
     public ActionQueue(CommData myComm)
     {
+            NestNameEnum myNestName = myComm.myNest;
+            centerX = myComm.nestData[myNestName.ordinal()].centerX;
+            centerY = myComm.nestData[myNestName.ordinal()].centerY;
         int i = 0;
         for (AntData myAntData : myComm.myAntList)
         {
@@ -121,16 +128,19 @@ public class ActionQueue
     adjFoodNode=Control.myMap.get(adjFoodRow).get(adjFoodCol);
     
     //\\fourth and final, ADD moveList to return to nest
-    int homeX= ClientRandomWalk.myClient.getCenterX();
-    int homeY= ClientRandomWalk.myClient.getCenterY();
-    currentNode=Control.myMap.get(homeY).get(homeX);
+    //System.out.println("what's the meaning?"+ClientRandomWalk.myClient.meaningOfLife);
+    currentNode=Control.myMap.get(centerY).get(centerX);
     LinkedList<AntAction> returnList = new LinkedList<AntAction>();
     returnList=myLine.findPath(adjFoodNode,currentNode);//TODO change this to antHill, not current
-    while (returnList != null)
+    
+    for(int i=0;i<returnList.size();i++)
     {
-      fetchList.add(returnList.getFirst());
-      returnList.removeFirst();
+      AntAction addThisActionToFetch=returnList.get(i);
+      fetchList.add(addThisActionToFetch);
     }
+    System.out.println("Ant:"+ant.id+" has actionQueue size "+commandMap.get(ant.id).size()+", but fetch list of size "+fetchList.size());
+    commandMap.put(ant.id,fetchList);
+    System.out.println("Ant:"+ant.id+" has actionQueue size "+commandMap.get(ant.id).size()+", but fetch list of size "+fetchList.size());
     return fetchList;
   }
     
@@ -169,4 +179,9 @@ public class ActionQueue
      
      return actionList;
    }
+   
+   public LinkedList<AntAction> collectWater(AntData ant, NodeData foodNode)//currently, this method returns the action list it built AND also populates the list of the and handed to it
+  {
+     return null;
+  }
 }
