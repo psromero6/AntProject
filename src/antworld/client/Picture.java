@@ -377,9 +377,9 @@ drawPane.setLocation(x, y);
  
   
   }
- public void refresh(){
-      //offScreenImage.flush();
-   offScreenImage.setData(savedImage.getData());
+  public void refresh(){
+      offScreenImage.flush();
+   offScreenImage.setData(savedImage.getRaster());
    repaint();
   }
   

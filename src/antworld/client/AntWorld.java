@@ -98,7 +98,7 @@ public class AntWorld
             {
                 startClick = e.getPoint();
                 //System.out.println("StartClick:"+startClick);
-                new refresh();
+               
             }
 
             @Override
@@ -163,10 +163,7 @@ public class AntWorld
 
     }
 
-    public class refresh
-    {
-
-    }
+   
 
     public static void drawPaneResize(Picture pic, char in)
     {
