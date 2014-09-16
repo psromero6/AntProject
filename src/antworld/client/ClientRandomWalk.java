@@ -296,6 +296,14 @@ public class ClientRandomWalk
     {
       commandAnts.updateActionQueue(ant);
       AntAction action = chooseAction(data, ant);
+      if(action.type==AntActionType.DROP)
+      {
+          System.out.println("Ant"+ant.id+" dropping off");
+      }
+      if(action.type==AntActionType.PICKUP)
+      {
+          System.out.println("Ant"+ant.id+" picking up");
+      }
 
       //  System.out.println(action.type+";"+action.direction);
       ant.myAction = action;
