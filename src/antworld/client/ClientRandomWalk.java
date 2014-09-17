@@ -28,7 +28,7 @@ import java.util.Random;
 public class ClientRandomWalk
 {
   private static final boolean DEBUG = true;
-  private static final boolean DRAW = true;
+  private static final boolean DRAW = false;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
   static ClientRandomWalk myClient;//package private?
@@ -351,7 +351,7 @@ public class ClientRandomWalk
         dropaction.quantity=ant.carryUnits;
         ant.myAction=dropaction;
         }
-        else if(ant.health<10&&nestDistance<10){
+        else if(ant.health<10&&nestDistance<10&&!ant.underground){
          System.out.println("GetDown");
          AntAction duckaction=new AntAction(AntActionType.ENTER_NEST);
          ant.myAction=duckaction;
@@ -592,14 +592,14 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
         //System.out.println("this ant is on a quest"+ant.gridX+";"+ant.gridY);
         else if ((commandAnts.questMapping.get(ant.id).type == AntActionType.PICKUP)&&!myActionQueue.isEmpty())//if that quest was to pick up food
       {
-        System.out.println("pickup");
+        System.out.println(ant.id+":pickup");
         AntAction nextActionFromList = myActionQueue.pop();//after list is built, get the first action on that list
         
        //System.out.println("geting list action"+nextActionFromList.type+";"+nextActionFromList.direction);
         return nextActionFromList;
       }
       else if((commandAnts.questMapping.get(ant.id).type == AntActionType.MOVE)){
-          System.out.println("exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
+          System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
          if(isObstructed(ant,data)){
              randomTrack(ant);
          }
@@ -626,14 +626,15 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       return commandAnts.questMapping.get(ant.id);
     } else
     {
-        action = myActionQueue.getFirst();
-        System.out.println("getting action"+action.type+" from queue   "+ant.gridX+";"+ant.gridY);
+        action = myActionQueue.pop();
+       // System.out.println(ant.id+":getting action"+action.type+" from queue   ");
       if(action.type==AntActionType.DROP) commandAnts.commandMap.put(ant.id,null);
-      myActionQueue.removeFirst();
+     // myActionQueue.removeFirst();
       
       //System.out.println("actionlistItem:" + action.type + "  " + action.direction);
     }
-System.out.println("at the bottom with job"+action.type+";"+action.direction);
+System.out.println(ant.id+":at the bottom with job:"+action.type+";"+action.direction);
+System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
     return action;
   }
 
@@ -656,13 +657,17 @@ System.out.println("at the bottom with job"+action.type+";"+action.direction);
       {
         antListToCollectFood.remove(0);//make sure ant list is empty before beginning
       }
+      int j=0;
       for(int i=0;i<numberOfAntsToCollectfood;i++)
       {
-        antListToCollectFood.add(mySortedAntList.get(i));
+          AntAction currentquest=commandAnts.questMapping.get(antListToCollectFood.get(i+j));
+          if(currentquest==null||currentquest.type==AntActionType.MOVE)
+        antListToCollectFood.add(mySortedAntList.get(i+j));
+          else j++;
       }
       if(antListToCollectFood.size()!=numberOfAntsToCollectfood)
       {
-        System.out.println("wrong number of ants to collect water");
+        System.out.println("wrong number of ants to collect food");
       }
       //now we have 10 ants closest to water
       for (AntData ant : antListToCollectFood)
@@ -698,9 +703,13 @@ System.out.println("at the bottom with job"+action.type+";"+action.direction);
       {
         antListToCollectWater.remove(0);//make sure ant list is empty before beginning
       }
+      int j=0;
       for(int i=0;i<numberOfAntsToCollectWater;i++)
       {
-        antListToCollectWater.add(mySortedAntList.get(i));
+          AntAction currentquest=commandAnts.questMapping.get(antListToCollectWater.get(i+j));
+          if(currentquest==null||currentquest.type==AntActionType.MOVE)
+        antListToCollectWater.add(mySortedAntList.get(i+j));
+          else j++;
       }
       if(antListToCollectWater.size()!=numberOfAntsToCollectWater)
       {
