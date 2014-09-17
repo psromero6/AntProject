@@ -25,7 +25,7 @@ public class BLine
   {
     LinkedList<AntAction> moveList = new LinkedList<AntAction>();
     NodeData currentNode=myStartLoc;//currentNode and variables only necessary to draw the path
-    GetDirection getDir=new GetDirection();
+    //GetDirection getDir=new GetDirection();
     int startRow = myStartLoc.getRowID();
     int startCol = myStartLoc.getColID();
     int currentRow=startRow;//
@@ -36,6 +36,7 @@ public class BLine
     int deltaCol = goalCol - startCol;
     int deltaRowSign=0;
     int deltaColSign=0;
+ 
 //    int deltaRow = startRow-goalRow;
 //    int deltaCol = startCol-goalCol;
     if (deltaRow != 0)
@@ -52,33 +53,41 @@ public class BLine
 
     while (deltaRow > 0 || deltaCol > 0)
     {
-      int dirX=0;//values to pass to getDir to return direcrtion Enum
-      int dirY=0;
-      AntAction action = new AntAction(AntAction.AntActionType.MOVE, 0, 0);
+      int dirX;//values to pass to getDir to return direcrtion Enum
+      int dirY;
+    //  AntAction action = new AntAction(AntAction.AntActionType.MOVE);
       if (deltaCol > 0)
       {
-//        action.x = deltaColSign;
         dirX=deltaColSign;
         currentCol+=deltaColSign;
         deltaCol--;
       }
+      else{
+      dirX=0;
+      }
+              
       if (deltaRow > 0)
       {
-//        action.y = deltaRowSign;
         dirY=deltaRowSign;
         currentRow+=deltaRowSign;
         deltaRow--;
       }
-      action.direction=getDir.returnDirEnum(dirX, dirY);
+      else{
+      dirY=0;
+      }
+    //  action.direction=getDir.returnDirEnum(dirX, dirY);
       
       
-      currentNode=myMap.get(currentRow).get(currentCol);
+      //currentNode=myMap.get(currentRow).get(currentCol);
 //      System.out.println("goalNode=("+currentRow+","+currentCol+")");
-      drawStep(currentNode);
-      moveList.add(action);
+      //drawStep(currentNode);
+        //System.out.println("start delta:"+(goalRow - startRow)+";"+(goalCol - startCol)+"running sign"+deltaColSign+";"+deltaRowSign+"calculating dir with"+dirX+";"+dirY+" what is left is:"+deltaCol+";"+deltaRow);
+        
+      moveList.add(new AntAction(AntAction.AntActionType.MOVE, GetDirection.returnDirEnum(dirX, dirY)));
+     //System.out.println(moveList.peek().direction);
     }
     
-    System.out.println("goalNode=("+myGoalLoc.getRowID()+","+myGoalLoc.getColID()+")");
+   // System.out.println("goalNode=("+myGoalLoc.getRowID()+","+myGoalLoc.getColID()+")");
     return moveList;
   }
 
@@ -89,6 +98,8 @@ public class BLine
     int currRow = currentNode.getRowID();
     int currCol = currentNode.getColID();
     int currH = 255;//Hvalue will not be populated for BLine
-  //  ClientRandomWalk.myClient.antworld.drawMapPixel(currCol, currRow, currH);
+   // ClientRandomWalk.myClient.antworld.gameBoard.setCenter(currCol, currRow);
+    //ClientRandomWalk.myClient.antworld.drawMapPixel(currCol, currRow, currH);
+    
   }
 }

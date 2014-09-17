@@ -44,16 +44,17 @@ public class ActionQueue
         }
     }
 
-    public void updateActionQueue(AntData ant)
-    {
-        LinkedList<AntAction> myActionQueue = commandMap.get(ant.id);//get the value for this key
-
-        AntAction myAction = new AntAction(AntActionType.MOVE, Direction.NORTH);
-        myActionQueue.add(myAction);
-    }
+//    public void updateActionQueue(AntData ant)
+//    {
+//        LinkedList<AntAction> myActionQueue = commandMap.get(ant.id);//get the value for this key
+//
+//        AntAction myAction = new AntAction(AntActionType.STASIS);
+//        myActionQueue.add(myAction);
+//    }
     
     public LinkedList<AntAction> collectFood(AntData ant, NodeData foodNode)//currently, this method returns the action list it built AND also populates the list of the and handed to it
   {
+        System.out.println("getfood");
     LinkedList<AntAction> fetchList = commandMap.get(ant.id);//get the actionList associated with the ant
     BLine myLine = new BLine();
     NodeData adjFoodNode;//Node adjacent to food
@@ -67,7 +68,7 @@ public class ActionQueue
     
     //\\First, calculate tile adjacent to foodNode, closest to startNode
     int currentRow = ant.gridY;
-    int currentCol = ant.gridY;
+    int currentCol = ant.gridX;
     NodeData currentNode=Control.myMap.get(currentRow).get(currentCol);
     int foodRow = foodNode.getRowID();
     int foodCol = foodNode.getColID();
@@ -97,10 +98,11 @@ public class ActionQueue
     yDirection=(-yDirection);//set these as direction TO foodNode FROM adjFoodNode
     GetDirection getDir=new GetDirection();
     action.direction=getDir.returnDirEnum(xDirection, yDirection);
-    action.quantity=25;//this is max?
-    
+    action.quantity=50;//this is max?
+   // System.out.println("should be pickup:"+action.type+";"+action.direction);
     fetchList.add(action);
-    
+   // System.out.println("should be the first of food quest:"+fetchList.peek().direction);
+ 
     //if x or y Dir == 0, swap them to move orthoganally
     if(xDirection==0||yDirection==0)
     {
@@ -131,17 +133,23 @@ public class ActionQueue
     //\\fourth and final, ADD moveList to return to nest
     //System.out.println("what's the meaning?"+ClientRandomWalk.myClient.meaningOfLife);
     currentNode=Control.myMap.get(centerY).get(centerX);
-    LinkedList<AntAction> returnList = new LinkedList<AntAction>();
+    LinkedList<AntAction> returnList = new LinkedList<>();
     returnList=myLine.findPath(adjFoodNode,currentNode);//TODO change this to antHill, not current
+
     
-    for(int i=0;i<returnList.size();i++)
-    {
-      AntAction addThisActionToFetch=returnList.get(i);
-      fetchList.add(addThisActionToFetch);
-    }
-    System.out.println("Ant:"+ant.id+" has actionQueue size "+commandMap.get(ant.id).size()+", but fetch list of size "+fetchList.size());
+    for (AntAction addAction : returnList) {
+            fetchList.add(addAction);
+        }
+    //add drop to end of list
+        AntAction dropaction=new AntAction(AntActionType.DROP);
+        dropaction.direction=Direction.NORTH;
+        dropaction.quantity=50;
+        
+        fetchList.add(dropaction);
+        
+  //  System.out.println("Ant:"+ant.id+" has actionQueue size "+commandMap.get(ant.id).size()+", but fetch list of size "+fetchList.size());
     commandMap.put(ant.id,fetchList);
-    System.out.println("Ant:"+ant.id+" has actionQueue size "+commandMap.get(ant.id).size()+", but fetch list of size "+fetchList.size());
+   // System.out.println("Ant:"+ant.id+" has actionQueue size "+commandMap.get(ant.id).size()+", but fetch list of size "+fetchList.size());
     return fetchList;
   }
     

@@ -29,8 +29,7 @@ public class Picture extends JFrame implements ComponentListener
   private int imageWidth, imageHeight;
   private BufferedImage offScreenImage;//,savedImage;
 
-  private DrawPane drawPane;
-  public Double zoomLvl;
+  private DrawPane drawPane;;
   private boolean error = false;
   
   
@@ -47,15 +46,14 @@ public class Picture extends JFrame implements ComponentListener
   //==================================================================
   public Picture(int insideWidth, int insideHeight)
   {
-    zoomLvl=2.0;
+   
     System.out.println(VERSION);
     this.setTitle(VERSION);
     
-    imageWidth = (int) (insideWidth/zoomLvl);
-    imageHeight = (int) (insideHeight/zoomLvl);
+    imageWidth = insideWidth;
+    imageHeight = insideHeight;
     offScreenImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-   // savedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-    
+   
     this.setResizable(false);
     this.setVisible(true);
     this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -102,9 +100,7 @@ public class Picture extends JFrame implements ComponentListener
   void setupWindowWithImageFromFile(String path)
   {
 
-    zoomLvl=1.0;
-    
-    offScreenImage =scaleImage(loadImage(path, this),zoomLvl);
+    offScreenImage =loadImage(path, this);
    // savedImage =scaleImage(loadImage(path, this),zoomLvl);
     if (offScreenImage == null)
     { error = true; 
@@ -112,8 +108,8 @@ public class Picture extends JFrame implements ComponentListener
     }
     
     this.setTitle(path);
-    imageWidth = (int) (offScreenImage.getWidth()*zoomLvl);
-    imageHeight = (int) (offScreenImage.getHeight()*zoomLvl);
+    imageWidth = offScreenImage.getWidth();
+    imageHeight = offScreenImage.getHeight();
     
     System.out.println(imageWidth+";"+imageHeight);
     this.setResizable(true);
@@ -329,8 +325,6 @@ public class Picture extends JFrame implements ComponentListener
   //=========================================================================
   public void setRGB(int x, int y, int r, int g, int b)
   {
-      x=(int) (x*zoomLvl);
-      y=(int) (y*zoomLvl);
     if (x<0) return;
     if (y<0) return;
     if (x>imageWidth) {System.out.println("x:"+x+" out:"+imageWidth);return;}
@@ -377,15 +371,13 @@ public class Picture extends JFrame implements ComponentListener
   }
   
   public void setCenter(int x, int y){
-    // int h=drawPane.getHeight();
-     //int w=drawPane.getWidth();
- //drawPane.setBounds(0,0,x+w,y+h);
+
 drawPane.setLocation(x, y);
  
   
   }
-  public void refresh(String path){
-   offScreenImage.flush();
+  public void refresh(){
+  // offScreenImage.flush();
     
   // offScreenImage.setData(savedImage.getRaster());
    repaint();

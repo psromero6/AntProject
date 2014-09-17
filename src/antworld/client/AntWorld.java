@@ -38,12 +38,8 @@ public class AntWorld
 
     //static Node[][] globalNodeMap;
 
-    static ArrayList<ArrayList<NodeData>> yourMap;
-    static ArrayList<AntData> scoutList;
-    static ArrayList<AntData> gathererList;
-    static int nturns;
+
     public static Picture gameBoard;
-    static float zoomLevel = 1.0f;
     static Point startClick = new Point(0, 0);
 
 //keeping track of the numer of turns
@@ -53,42 +49,11 @@ public class AntWorld
      */
     public AntWorld(CommData data) throws IOException
     {
-        scoutList = new ArrayList<AntData>();
-        //Control comptrol=
-        //need to initalize global myMap
-        yourMap = new Control().myMap;
         //globalNodeMap= buildMap(readImage());
         NestData myNest = new NestData(NestNameEnum.ACORN, TeamNameEnum.Buffalograss, 0, 0);//
         gameBoard=new Picture("AntWorld.png");
         gameBoard.setResizable(true);
         gameBoard.setSize(gameBoard.getImageWidth()/2,gameBoard.getImageHeight()/2);
-
-        
-        
-        
-        
-
-//        gameBoard.addMouseWheelListener(new MouseWheelListener()
-//        {
-//
-//            @Override
-//            public void mouseWheelMoved(MouseWheelEvent e)
-//            {
-//                int notches = e.getWheelRotation();
-//
-//                if (notches < 0)
-//                {
-//                    gameBoard.zoom('i', e.getPoint());
-//                }
-//                if (notches > 0)
-//                {
-//                    gameBoard.zoom('o', e.getPoint());
-//                }
-//                //gameBoard.setCenter(0,0);
-//            }
-//        });
-
-        
 
         gameBoard.addMouseMotionListener(new MouseMotionListener()
         {
@@ -148,7 +113,7 @@ public class AntWorld
     public void draw(CommData data)
     {
 
-        gameBoard.refresh("AntWorld.png");
+        gameBoard.refresh();
         for (AntData ant : data.myAntList)
         {
             drawMyAnt(ant.gridX, ant.gridY);
@@ -217,7 +182,7 @@ public class AntWorld
 
     public void drawMapPixel(int x, int y, int hVal)
     {
-        int size = 1;
+        int size = 3;
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)

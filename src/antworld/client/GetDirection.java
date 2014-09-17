@@ -19,7 +19,7 @@ import antworld.data.Direction;
  */
 public class GetDirection
 {
-  public Direction returnDirEnum(int x, int y)
+  public static Direction returnDirEnum(int x, int y)
   {
     if(x==-1)
     {
@@ -38,7 +38,7 @@ public class GetDirection
       }      
     }
     
-    if(x==0)
+   else if(x==0)
     {
       if(y==-1)
       {
@@ -55,9 +55,9 @@ public class GetDirection
       }      
     }
     
-    if(x==1)
+  else  if(x==1)
     {
-      if(y==-1)
+      if(y==1)
       {
         return Direction.SOUTHEAST;
       }
@@ -66,7 +66,7 @@ public class GetDirection
         return Direction.EAST;
       }
       
-      else if(y==1)//else if for security, could read else
+      else if(y==-1)//else if for security, could read else
       {
         return Direction.NORTHEAST;
       }      
