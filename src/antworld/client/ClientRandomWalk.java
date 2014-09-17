@@ -28,7 +28,7 @@ import java.util.Random;
 public class ClientRandomWalk
 {
   private static final boolean DEBUG = true;
-  private static final boolean DRAW = false;
+  private static final boolean DRAW = true;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
   static ClientRandomWalk myClient;//package private?
@@ -648,7 +648,7 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
       NodeData closestfoodNode=Control.myMap.get(fd.gridY).get(fd.gridX);//consider making this an algorithm, this is closest to Bullet base
       ArrayList<AntData> mySortedAntList=data.myAntList;//
       DistanceCompare myDistComp=new DistanceCompare();//SET the compare node in this class!!!      
-      int numberOfAntsToCollectfood=2;
+      int numberOfAntsToCollectfood=1;
       myDistComp.goalNode=closestfoodNode;//now it is set
       
       Collections.sort(mySortedAntList,myDistComp);//sortedAntList now sorted
@@ -657,13 +657,22 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
       {
         antListToCollectFood.remove(0);//make sure ant list is empty before beginning
       }
-      int j=0;
+      boolean getAnt;
+      int j;
       for(int i=0;i<numberOfAntsToCollectfood;i++)
-      {
-          AntAction currentquest=commandAnts.questMapping.get(antListToCollectFood.get(i+j));
-          if(currentquest==null||currentquest.type==AntActionType.MOVE)
-        antListToCollectFood.add(mySortedAntList.get(i+j));
+      { getAnt=true;
+        j=0;
+          while(getAnt&&(i+j)<mySortedAntList.size()){
+              AntData ant=mySortedAntList.get(i+j);
+         
+          if(commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE)
+          {
+              antListToCollectFood.add(ant);
+              getAnt=false;
+          }
           else j++;
+          }
+          
       }
       if(antListToCollectFood.size()!=numberOfAntsToCollectfood)
       {
