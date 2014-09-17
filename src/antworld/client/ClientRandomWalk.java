@@ -29,7 +29,10 @@ import java.util.Random;
 public class ClientRandomWalk
 {
   private static final boolean DEBUG = false;
-  private static final boolean DRAW = true;
+  private static final boolean TRACKACTION = false;
+  private static final boolean SCOREING = true;
+  private static final boolean DRAW = false;
+  private static final boolean BUILD = false;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
   static ClientRandomWalk myClient;//package private?
@@ -186,7 +189,7 @@ public class ClientRandomWalk
     oldFood=new ArrayList<>();
  System.out.println("controlStop");
     commandAnts = new ActionQueue(data);
- System.out.println("actionlQueque made");
+ System.out.println("actionlQueue made");
     //antworld.setLocation(centerX, centerX);
     //testing with initalizing actions psr
     AntAction action = new AntAction(AntActionType.STASIS);
@@ -210,7 +213,7 @@ public class ClientRandomWalk
       }
       try
       {
-           System.out.println("loop");
+           
         if (DEBUG)
         {
           System.out.println("ClientRandomWalk: chooseActions: " + myNestName);
@@ -234,15 +237,15 @@ public class ClientRandomWalk
         HashSet<FoodData> food = data.foodSet;
     FoodData[] myFoodArray = new FoodData[food.size()];
     food.toArray(myFoodArray);
-        System.out.println(data.gameTick);
+       if(SCOREING){ System.out.println(data.gameTick);
         for(int fd :data.foodStockPile){
         System.out.print(fd+";");        
         }
         
         
         
-        System.out.println("total number of ants"+data.myAntList.size()+" xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-     
+        System.out.println("total number of ants"+data.myAntList.size()+" xxxxxxxx");
+       }
         for(FoodData fd : myFoodArray){
            // System.out.println(fd.foodType+";"+fd.gridX+";"+fd.gridY);
             if((oldFood.isEmpty()||oldFood.contains(fd)||(data.gameTick%500==0))&&fd.foodType!=FoodType.WATER)collectFood(myFoodArray,data);
@@ -349,7 +352,7 @@ public class ClientRandomWalk
         
         
         if(ant.carryUnits>0&&nestDistance<10){
-        System.out.println("Drop it sucka");
+      if(SCOREING) System.out.println("Drop it sucka");
         AntAction dropaction=new AntAction(AntActionType.DROP);
         dropaction.direction=Direction.getRandomDir();
         dropaction.quantity=ant.carryUnits;
@@ -358,7 +361,7 @@ public class ClientRandomWalk
         
         
         else if(ant.health<10&&nestDistance<10&&!ant.underground){
-         System.out.println("GetDown");
+         if(SCOREING) System.out.println("GetDown");
          AntAction duckaction=new AntAction(AntActionType.ENTER_NEST);
          ant.myAction=duckaction;
         }
@@ -374,7 +377,7 @@ public class ClientRandomWalk
         else{
         if(ant.carryUnits>0&&(commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type!=AntActionType.DROP)))
         {
-            System.out.println("I have grub.........................................");
+            if(TRACKACTION) System.out.println("I have grub.........................................");
             NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, homeNode));
             
@@ -386,11 +389,11 @@ public class ClientRandomWalk
             AntAction action = chooseAction(data, ant);
             if(action.type==AntActionType.DROP)
             {
-                System.out.println("Ant"+ant.id+" dropping off");
+             if(TRACKACTION)    System.out.println("Ant"+ant.id+" dropping off");
             }
             if(action.type==AntActionType.PICKUP)
             {
-                System.out.println("Ant"+ant.id+" picking up");
+             if(TRACKACTION)    System.out.println("Ant"+ant.id+" picking up");
             }
 
             //  System.out.println(action.type+";"+action.direction);
@@ -409,12 +412,23 @@ public class ClientRandomWalk
     
     
   }
-  
-  if(data.foodStockPile[4]>1000){
+    if(BUILD){
+   if(data.foodStockPile[3]>100){
+  AntData attackAnt=new AntData(Constants.UNKNOWN_ANT_ID, AntType.ATTACK, data.myNest, data.myTeam);
+  attackAnt.myAction=new AntAction(AntActionType.BIRTH); 
+  data.myAntList.add(attackAnt);
+   
+  }
+  if(data.foodStockPile[4]>100){
   AntData speedAnt=new AntData(Constants.UNKNOWN_ANT_ID, AntType.SPEED, data.myNest, data.myTeam);
   speedAnt.myAction=new AntAction(AntActionType.BIRTH); 
   data.myAntList.add(speedAnt);
    
+  }
+    }
+  for(AntData dickAnt: data.enemyAntSet){
+  if(dickAnt.myAction.type==AntActionType.ATTACK)System.out.println("enemy ant attack!!!!!!!!!!!!!!!!");
+  
   }
   
   
@@ -447,7 +461,7 @@ public class ClientRandomWalk
     
     
     if(ant.carryUnits>0){
-    System.out.println("has food.."+ant.gridX+";"+ant.gridY+"...................");
+   if(TRACKACTION)  System.out.println("has food.."+ant.gridX+";"+ant.gridY+"...................");
     
     }
     
@@ -460,7 +474,7 @@ public class ClientRandomWalk
        commandAnts.commandMap.get(ant.id).clear();
         
         
-        System.out.println("dropoff food");
+      if(TRACKACTION)   System.out.println("dropoff food");
     NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
         commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.DROP));
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode,Control.myMap.get(centerY).get(centerX)));
@@ -503,11 +517,11 @@ public class ClientRandomWalk
     {
       if(ant.health<10)//do not emerge at less than half health
       {
-        System.out.println("ant"+ant.id+" is underground with low health of "+ant.health);
+       if(TRACKACTION)  System.out.println("ant"+ant.id+" is underground with low health of "+ant.health);
         AntAction healAction = new AntAction(AntActionType.HEAL);
         return healAction;
       }
-      System.out.println("Climbing out   " + ant.id);
+     if(TRACKACTION)  System.out.println("Climbing out   " + ant.id);
       //initalizing the queque
 
       action = scatter(ant.id);
@@ -525,10 +539,10 @@ public class ClientRandomWalk
     
 if((ant.health<10)&&(commandAnts.questMapping.get(ant.id)==null||commandAnts.questMapping.get(ant.id).type!=AntActionType.HEAL))//test to see if ant needs to return home to heal
     {
-      System.out.println("ant"+ant.id+" has low health, returning to base");
+     if(TRACKACTION)  System.out.println("ant"+ant.id+" has low health, returning to base");
       AntAction currentQuest=commandAnts.questMapping.get(ant.id);
      
-          System.out.println("quest set to heal");
+        if(TRACKACTION)   System.out.println("quest set to heal");
           NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
           NodeData homeNode=Control.myMap.get(centerY).get(centerX);
            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, homeNode));
@@ -563,11 +577,11 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       //   System.out.println(Math.abs(f.gridX-ant.gridX)+Math.abs(f.gridY-ant.gridY));
       if(Math.abs(f.gridX - ant.gridX) + Math.abs(f.gridY - ant.gridY) < 5&&f.foodType!=FoodType.WATER&&ant.carryUnits<1)
       {
-          System.out.println("food seen:"+ant.id);
+      if(TRACKACTION)     System.out.println("food seen:"+ant.id);
         AntAction currentQuest = commandAnts.questMapping.get(ant.id);//if the ant is within 200 units of foos AND its current action is not to go get that, then build and action list to do so
-        System.out.println("food seen"+currentQuest);
+      if(TRACKACTION)   System.out.println("food seen"+currentQuest);
         if(currentQuest==null||currentQuest.type==AntActionType.MOVE){
-          System.out.println("starting food quest");
+       if(TRACKACTION)    System.out.println("starting food quest");
           NodeData foodNode=Control.myMap.get(f.gridY).get(f.gridX);
           commandAnts.commandMap.put(ant.id,commandAnts.collectFood(ant, foodNode));//builds a list of actions to go get food and return with it
           commandAnts.questMapping.put(ant.id,new AntAction(AntActionType.PICKUP));
@@ -611,7 +625,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
         //System.out.println("this ant is on a quest"+ant.gridX+";"+ant.gridY);
         else if ((commandAnts.questMapping.get(ant.id).type == AntActionType.PICKUP)&&!myActionQueue.isEmpty())//if that quest was to pick up food
       {
-        System.out.println(ant.id+":pickup");
+       if(TRACKACTION)  System.out.println(ant.id+":pickup");
         AntAction nextActionFromList = myActionQueue.pop();//after list is built, get the first action on that list
         
        //System.out.println("geting list action"+nextActionFromList.type+";"+nextActionFromList.direction);
@@ -632,7 +646,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
             if(commandAnts.commandMap==null||commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id).isEmpty()||commandAnts.commandMap.isEmpty()){
             NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
-            System.out.println(ant.gridY+";"+ant.gridX+commandAnts.commandMap.get(ant.id));
+       if(TRACKACTION)      System.out.println(ant.gridY+";"+ant.gridX+commandAnts.commandMap.get(ant.id));
             
             }
             
@@ -660,20 +674,20 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
     if (myActionQueue==null||myActionQueue.isEmpty())
     {
         
-        System.out.println("running random track:"+ant.gridX+";"+ant.gridY);
+      if(TRACKACTION)   System.out.println("running random track:"+ant.gridX+";"+ant.gridY);
       randomTrack(ant);
       return commandAnts.questMapping.get(ant.id);
     } else
     {
         action = myActionQueue.pop();
-        System.out.println(ant.id+":getting action"+action.type+" from queue   ");
+      if(TRACKACTION)   System.out.println(ant.id+":getting action"+action.type+" from queue   ");
       if(action.type==AntActionType.DROP) commandAnts.questMapping.put(ant.id,null);
      // myActionQueue.removeFirst();
       
       //System.out.println("actionlistItem:" + action.type + "  " + action.direction);
     }
-System.out.println(ant.id+":at the bottom with job:"+action.type+";"+action.direction);
-System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
+ if(TRACKACTION)System.out.println(ant.id+":at the bottom with job:"+action.type+";"+action.direction);
+ if(TRACKACTION)System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
     return action;
   }
 
@@ -682,7 +696,7 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
    private void collectFood(FoodData[] food, CommData data)
     {
         for(FoodData fd : food){
-        System.out.println("getting Food");
+       if(TRACKACTION)  System.out.println("getting Food");
       ArrayList<AntData> antListToCollectFood=new ArrayList<AntData>();
       NodeData closestfoodNode=Control.myMap.get(fd.gridY).get(fd.gridX);//consider making this an algorithm, this is closest to Bullet base
       ArrayList<AntData> mySortedAntList=data.myAntList;//
@@ -704,7 +718,7 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
           if(ant.myAction.type!=AntActionType.BIRTH&&(commandAnts.questMapping==null||commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type)==AntActionType.MOVE))
           {
               antListToCollectFood.add(ant);
-              System.out.println("assign this ant");
+             if(TRACKACTION)  System.out.println("assign this ant");
               getAnt=false;
           }
           j++;
@@ -716,7 +730,7 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
        // System.out.println("wrong number of ants to collect food:"+antListToCollectFood.size());
       }
       else{
-      System.out.println("getting food as assigned:"+fd.foodType);
+    if(TRACKACTION)   System.out.println("getting food as assigned:"+fd.foodType);
       }
       //now we have 10 ants closest to water
       for (AntData ant : antListToCollectFood)
@@ -762,7 +776,7 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
       }
       if(antListToCollectWater.size()!=numberOfAntsToCollectWater)
       {
-        System.out.println("wrong number of ants to collect water");
+     if(TRACKACTION)    System.out.println("wrong number of ants to collect water");
       }
       //now we have 10 ants closest to water
       for (AntData ant : antListToCollectWater)
