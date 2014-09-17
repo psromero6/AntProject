@@ -629,9 +629,15 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       }else if((commandAnts.questMapping.get(ant.id).type == AntActionType.DROP)){
         //  System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
          
-       
+            if(commandAnts.commandMap==null||commandAnts.commandMap.isEmpty()){
+            NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
+            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerY)));
+            
+            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerY)));
+            
+            }
         
-             return commandAnts.commandMap.get(ant.id).pop();
+            return commandAnts.commandMap.get(ant.id).pop();
          
       
       }
