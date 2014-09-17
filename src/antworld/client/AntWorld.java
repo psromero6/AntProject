@@ -175,6 +175,7 @@ public class AntWorld
             {
                 //int blue=gameBoard.getBlue(x+i-size, y+j-size);
                 gameBoard.setRGB(x + i - size, y + j - size, 255, 255, 255);
+                if((j>0)&&(j+1<size)&&(i>1)&&(i+1<size))gameBoard.setRGB(x + i - size, y + j - size, 0, 200, 200);
             }
         }
 
@@ -187,7 +188,7 @@ public class AntWorld
         {
             for (int j = 0; j < size; j++)
             {
-                gameBoard.setRGB(x + i - size, y + j - size, 255 - (hVal % 255), (hVal % 255), 0);
+                gameBoard.setRGB(x + i - size, y + j - size, 255 - (hVal % 255), (hVal % 255), 0);                
             }
         }
     }
