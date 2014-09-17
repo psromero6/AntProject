@@ -628,12 +628,11 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       
       }else if((commandAnts.questMapping.get(ant.id).type == AntActionType.DROP)){
         //  System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
-         if(isObstructed(ant,data)){
-             randomTrack(ant);
-         }
+         
        
-         else{ return commandAnts.commandMap.get(ant.id).pop();
-         }
+        
+             return commandAnts.commandMap.get(ant.id).pop();
+         
       
       }
         
