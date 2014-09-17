@@ -206,7 +206,7 @@ public class ClientRandomWalk
     // drawAnts(data);
     while (true)
     {antworld.draw(data);
-      if (DRAW&&(data.gameTick%50==0))
+      if (DRAW&&(data.gameTick%150==0))
       {
         antworld.resetPic();
           System.out.println("draw");
@@ -250,7 +250,7 @@ public class ClientRandomWalk
        }
         for(FoodData fd : myFoodArray){
            // System.out.println(fd.foodType+";"+fd.gridX+";"+fd.gridY);
-            if((oldFood.isEmpty()||oldFood.contains(fd)||(data.gameTick%500==0))&&fd.foodType!=FoodType.WATER)collectFood(myFoodArray,data);
+            if((oldFood.isEmpty()||oldFood.contains(fd)||(data.gameTick%150==0))&&fd.foodType!=FoodType.WATER)collectFood(myFoodArray,data);
             
             
         }
