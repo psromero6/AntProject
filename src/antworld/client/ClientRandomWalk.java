@@ -629,24 +629,24 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       }else if((commandAnts.questMapping.get(ant.id).type == AntActionType.DROP)){
         //  System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
          
-            if(commandAnts.commandMap==null||commandAnts.commandMap.isEmpty()){
+            if(commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id).isEmpty()){
             NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
-            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerY)));
+            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
             
-            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerY)));
+            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
             
             }
-        
-            return commandAnts.commandMap.get(ant.id).pop();
-         
-      
+        //System.out.println(commandAnts.commandMap.get(ant.id));
+            action= commandAnts.commandMap.get(ant.id).pop();
+         // System.out.println(action);
+      return action;
       }
         
         
     }   
     if(Math.abs(centerX - ant.gridX) + Math.abs(centerY - ant.gridY) > 700&& (commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE)){
         NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
-            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerY)));
+            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
             commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.MOVE));
     }
     
