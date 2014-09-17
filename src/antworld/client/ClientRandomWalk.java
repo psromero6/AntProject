@@ -343,16 +343,28 @@ public class ClientRandomWalk
     
     for (AntData ant : data.myAntList)
     {
-        
-        if(ant.carryUnits>0&&(Math.abs(ant.gridX-centerX)+Math.abs(ant.gridY-centerY)<10)){
+        int nestDistance=Math.abs(ant.gridX-centerX)+Math.abs(ant.gridY-centerY);
+        if(ant.carryUnits>0&&nestDistance<10){
         System.out.println("Drop it sucka");
         AntAction dropaction=new AntAction(AntActionType.DROP);
         dropaction.direction=Direction.getRandomDir();
         dropaction.quantity=ant.carryUnits;
         ant.myAction=dropaction;
         }
+        else if(ant.health<10&&nestDistance<10){
+         System.out.println("GetDown");
+         AntAction duckaction=new AntAction(AntActionType.ENTER_NEST);
+         ant.myAction=duckaction;
+        }
+        
+        else if(goHome){
+        NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
+            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, homeNode));
+            
+            commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.DROP));
+        }
         else{
-        if(goHome&&ant.carryUnits>0)
+        if(ant.carryUnits>0)
         {
             NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, homeNode));
@@ -445,15 +457,7 @@ public class ClientRandomWalk
     
     
     
-    if((ant.health<10))//test to see if ant needs to return home to heal
-    {
-      System.out.println("ant"+ant.id+" has low health, returning to base");
-      AntAction currentQuest=commandAnts.questMapping.get(ant.id);
-      if(currentQuest==null||currentQuest.type!=AntActionType.HEAL)
-      {
-        commandAnts.commandMap.put(ant.id,commandAnts.nestToHeal(ant));//builds a list of actions to return and heal
-      }
-    }
+    
     
     
     
@@ -500,7 +504,18 @@ public class ClientRandomWalk
     }
        
     
-
+if((ant.health<10)&&(commandAnts.questMapping.get(ant.id)==null||commandAnts.questMapping.get(ant.id).type!=AntActionType.HEAL))//test to see if ant needs to return home to heal
+    {
+      System.out.println("ant"+ant.id+" has low health, returning to base");
+      AntAction currentQuest=commandAnts.questMapping.get(ant.id);
+     
+          System.out.println("quest set to heal");
+          NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
+          NodeData homeNode=Control.myMap.get(centerY).get(centerX);
+           commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, homeNode));
+       commandAnts.questMapping.put(ant.id,new AntAction(AntActionType.HEAL));//builds a list of actions to return and heal
+      
+    }
 
 
 
@@ -520,12 +535,12 @@ public class ClientRandomWalk
     //   System.out.println(a.length+";"+data.foodSet.isEmpty());
     
     
-    //tremoved for testing
+   
     if(true){
-if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id).isEmpty()||commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE){
+if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id).isEmpty()||commandAnts.questMapping.get(ant.id)==null||commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE){
     for (FoodData f : myFoodArray)
     {
-      //all ants within 200 pixels of the food will go pick it up.
+      //all ants within 5 pixels of the food will go pick it up.
       //   System.out.println(Math.abs(f.gridX-ant.gridX)+Math.abs(f.gridY-ant.gridY));
       if(Math.abs(f.gridX - ant.gridX) + Math.abs(f.gridY - ant.gridY) < 5&&f.foodType!=FoodType.WATER&&ant.carryUnits<1)
       {
@@ -537,7 +552,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
           NodeData foodNode=Control.myMap.get(f.gridY).get(f.gridX);
           commandAnts.commandMap.put(ant.id,commandAnts.collectFood(ant, foodNode));//builds a list of actions to go get food and return with it
           commandAnts.questMapping.put(ant.id,new AntAction(AntActionType.PICKUP));
-          break;//break in case an ant is within 200 units of multiple food sources, it'll just go to the first on on the list
+          break;//break in case an ant is within 5 units of multiple food sources, it'll just go to the first on on the list
       }
         //else keep doing the quest you were doing
       }
@@ -558,19 +573,21 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
     
     if(commandAnts.questMapping.get(ant.id)!=null)//then it has been sent on a quest
     {
+        //disabling for debugging
         if ((commandAnts.questMapping.get(ant.id).type == AntActionType.HEAL))//if that quest was to heal
-      {
-        System.out.println("ant" + ant.id + " has low health, returning to base");
+         {
+//       
         if (ant.health == 20)//test to see if healing complete
         {
-          commandAnts.questMapping.put(ant.id, null);
+//          System.out.println("ant" + ant.id + " has low health, starting return to base");
+         commandAnts.questMapping.put(ant.id, null);
         }
        
        
-       if(commandAnts.commandMap.get(ant.id).isEmpty())commandAnts.commandMap.put(ant.id , commandAnts.nestToHeal(ant));
-       myActionQueue = commandAnts.commandMap.get(ant.id);
-        AntAction nextActionFromList = myActionQueue.pop();//after list is built, get the first action on that list
-        return nextActionFromList;
+//       if(commandAnts.commandMap.get(ant.id).isEmpty())commandAnts.commandMap.put(ant.id , commandAnts.nestToHeal(ant));
+      // myActionQueue = commandAnts.commandMap.get(ant.id);
+      //  AntAction nextActionFromList = myActionQueue.pop();//after list is built, get the first action on that list
+       // return nextActionFromList;
       }
         //System.out.println("this ant is on a quest"+ant.gridX+";"+ant.gridY);
         else if ((commandAnts.questMapping.get(ant.id).type == AntActionType.PICKUP)&&!myActionQueue.isEmpty())//if that quest was to pick up food
@@ -586,11 +603,8 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
          if(isObstructed(ant,data)){
              randomTrack(ant);
          }
-         else if(commandAnts.questMapping.get(ant.id).direction==null){
-         
-            // return commandAnts.commandMap.get(ant.id).pop();
-         }
-         else{ ant.myAction=commandAnts.questMapping.get(ant.id);
+       
+         else{ return commandAnts.questMapping.get(ant.id);
          }
       
       }
