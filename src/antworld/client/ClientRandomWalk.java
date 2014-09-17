@@ -629,13 +629,17 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       }else if((commandAnts.questMapping.get(ant.id).type == AntActionType.DROP)){
         //  System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
          
-            if(commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id).isEmpty()){
+            if(commandAnts.commandMap==null||commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id).isEmpty()||commandAnts.commandMap.isEmpty()){
             NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
-            
-            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
+            System.out.println(ant.gridY+";"+ant.gridX+commandAnts.commandMap.get(ant.id));
             
             }
+            
+            if(commandAnts.commandMap.get(ant.id).isEmpty()){
+                
+                commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.STASIS));
+                return new AntAction(AntActionType.STASIS);}
         //System.out.println(commandAnts.commandMap.get(ant.id));
             action= commandAnts.commandMap.get(ant.id).pop();
          // System.out.println(action);
