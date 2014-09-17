@@ -31,8 +31,8 @@ public class ClientRandomWalk
   private static final boolean DEBUG = false;
   private static final boolean TRACKACTION = false;
   private static final boolean SCOREING = true;
-  private static final boolean DRAW = false;
-  private static final boolean BUILD = false;
+  private static final boolean DRAW = true;
+  private static final boolean BUILD = true;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
   static ClientRandomWalk myClient;//package private?
