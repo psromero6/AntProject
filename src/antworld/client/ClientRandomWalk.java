@@ -29,7 +29,7 @@ import java.util.Random;
 public class ClientRandomWalk
 {
   private static final boolean DEBUG = false;
-  private static final boolean DRAW = false;
+  private static final boolean DRAW = true;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
   static ClientRandomWalk myClient;//package private?
@@ -236,12 +236,12 @@ public class ClientRandomWalk
     food.toArray(myFoodArray);
         System.out.println(data.gameTick);
         for(int fd :data.foodStockPile){
-        System.out.print(fd+";");
-        
+        System.out.print(fd+";");        
         }
         
         
-        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+        
+        System.out.println("total number of ants"+data.myAntList.size()+" xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
      
         for(FoodData fd : myFoodArray){
            // System.out.println(fd.foodType+";"+fd.gridX+";"+fd.gridY);
