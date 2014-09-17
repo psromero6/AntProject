@@ -4,6 +4,7 @@ import static antworld.client.AntWorld.gameBoard;
 import antworld.data.AntAction;
 import antworld.data.AntAction.AntActionType;
 import antworld.data.AntData;
+import antworld.data.AntType;
 import antworld.data.CommData;
 import antworld.data.Constants;
 import antworld.data.Direction;
@@ -344,6 +345,9 @@ public class ClientRandomWalk
     for (AntData ant : data.myAntList)
     {
         int nestDistance=Math.abs(ant.gridX-centerX)+Math.abs(ant.gridY-centerY);
+        
+        
+        
         if(ant.carryUnits>0&&nestDistance<10){
         System.out.println("Drop it sucka");
         AntAction dropaction=new AntAction(AntActionType.DROP);
@@ -351,21 +355,26 @@ public class ClientRandomWalk
         dropaction.quantity=ant.carryUnits;
         ant.myAction=dropaction;
         }
+        
+        
         else if(ant.health<10&&nestDistance<10&&!ant.underground){
          System.out.println("GetDown");
          AntAction duckaction=new AntAction(AntActionType.ENTER_NEST);
          ant.myAction=duckaction;
         }
         
+        
+        
         else if(goHome){
         NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, homeNode));
             
-            commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.DROP));
+            commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.ENTER_NEST));
         }
         else{
-        if(ant.carryUnits>0)
+        if(ant.carryUnits>0&&(commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type!=AntActionType.DROP)))
         {
+            System.out.println("I have grub.........................................");
             NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, homeNode));
             
@@ -399,7 +408,17 @@ public class ClientRandomWalk
     
     
     
-  }}
+  }
+  
+  if(data.foodStockPile[4]>1000){
+  AntData speedAnt=new AntData(Constants.UNKNOWN_ANT_ID, AntType.SPEED, data.myNest, data.myTeam);
+  speedAnt.myAction=new AntAction(AntActionType.BIRTH); 
+  data.myAntList.add(speedAnt);
+   
+  }
+  
+  
+  }
 
   private AntAction chooseAction(CommData data, AntData ant)
   {
@@ -493,10 +512,10 @@ public class ClientRandomWalk
 
       action = scatter(ant.id);
 
-      for (int i = 0; i < 100; i++)
-      {
-        myActionQueue.add(action);
-      }
+//      for (int i = 0; i < 100; i++)
+//      {
+//      myActionQueue.add(action);
+//      }
       AntAction exitAction = new AntAction(AntActionType.EXIT_NEST);
       exitAction.x = centerX - Constants.NEST_RADIUS + random.nextInt(2 * Constants.NEST_RADIUS);
       exitAction.y = centerY - Constants.NEST_RADIUS + random.nextInt(2 * Constants.NEST_RADIUS);
@@ -599,7 +618,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
         return nextActionFromList;
       }
       else if((commandAnts.questMapping.get(ant.id).type == AntActionType.MOVE)){
-          System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
+        //  System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
          if(isObstructed(ant,data)){
              randomTrack(ant);
          }
@@ -607,9 +626,20 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
          else{ return commandAnts.questMapping.get(ant.id);
          }
       
+      }else if((commandAnts.questMapping.get(ant.id).type == AntActionType.DROP)){
+        //  System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
+         if(isObstructed(ant,data)){
+             randomTrack(ant);
+         }
+       
+         else{ return commandAnts.commandMap.get(ant.id).pop();
+         }
+      
       }
+        
+        
     }   
-    if(Math.abs(centerX - ant.gridX) + Math.abs(centerY - ant.gridY) > 700){
+    if(Math.abs(centerX - ant.gridX) + Math.abs(centerY - ant.gridY) > 700&& (commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE)){
         NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerY)));
             commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.MOVE));
@@ -627,8 +657,8 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
     } else
     {
         action = myActionQueue.pop();
-       // System.out.println(ant.id+":getting action"+action.type+" from queue   ");
-      if(action.type==AntActionType.DROP) commandAnts.commandMap.put(ant.id,null);
+        System.out.println(ant.id+":getting action"+action.type+" from queue   ");
+      if(action.type==AntActionType.DROP) commandAnts.questMapping.put(ant.id,null);
      // myActionQueue.removeFirst();
       
       //System.out.println("actionlistItem:" + action.type + "  " + action.direction);
@@ -662,7 +692,7 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
           while(getAnt&&(i+j)<mySortedAntList.size()){
               AntData ant=mySortedAntList.get(i+j);
         // System.out.println((commandAnts.questMapping==null)+";"+(commandAnts.questMapping.isEmpty())+";"+(commandAnts.questMapping.get(ant.id)==null)+";"+(commandAnts.questMapping.get(ant.id).type));
-          if(commandAnts.questMapping==null||commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type)==AntActionType.MOVE)
+          if(ant.myAction.type!=AntActionType.BIRTH&&(commandAnts.questMapping==null||commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type)==AntActionType.MOVE))
           {
               antListToCollectFood.add(ant);
               System.out.println("assign this ant");
@@ -796,7 +826,7 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
    
       action.direction = Direction.getRandomDir();
      LinkedList<AntAction> explore=new LinkedList<>();
-    for(int i=0;i<100;i++){explore.add(action);}
+    for(int i=0;i<50;i++){explore.add(action);}
       commandAnts.commandMap.put(ant.id,explore);
     
       
