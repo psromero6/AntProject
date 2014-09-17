@@ -27,8 +27,8 @@ import java.util.Random;
 
 public class ClientRandomWalk
 {
-  private static final boolean DEBUG = true;
-  private static final boolean DRAW = true;
+  private static final boolean DEBUG = false;
+  private static final boolean DRAW = false;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
   static ClientRandomWalk myClient;//package private?
@@ -653,10 +653,7 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
       
       Collections.sort(mySortedAntList,myDistComp);//sortedAntList now sorted
       
-      while(antListToCollectFood.size()<0)
-      {
-        antListToCollectFood.remove(0);//make sure ant list is empty before beginning
-      }
+ 
       boolean getAnt;
       int j;
       for(int i=0;i<numberOfAntsToCollectfood;i++)
@@ -664,19 +661,23 @@ System.out.println("on quest:"+commandAnts.questMapping.get(ant.id));
         j=0;
           while(getAnt&&(i+j)<mySortedAntList.size()){
               AntData ant=mySortedAntList.get(i+j);
-         
-          if(commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE)
+        // System.out.println((commandAnts.questMapping==null)+";"+(commandAnts.questMapping.isEmpty())+";"+(commandAnts.questMapping.get(ant.id)==null)+";"+(commandAnts.questMapping.get(ant.id).type));
+          if(commandAnts.questMapping==null||commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type)==AntActionType.MOVE)
           {
               antListToCollectFood.add(ant);
+              System.out.println("assign this ant");
               getAnt=false;
           }
-          else j++;
+          j++;
           }
           
       }
       if(antListToCollectFood.size()!=numberOfAntsToCollectfood)
       {
-        System.out.println("wrong number of ants to collect food");
+       // System.out.println("wrong number of ants to collect food:"+antListToCollectFood.size());
+      }
+      else{
+      System.out.println("getting food as assigned:"+fd.foodType);
       }
       //now we have 10 ants closest to water
       for (AntData ant : antListToCollectFood)
