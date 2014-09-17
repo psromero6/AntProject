@@ -208,9 +208,9 @@ public class ClientRandomWalk
     {antworld.draw(data);
       if (DRAW&&(data.gameTick%50==0))
       {
-          antworld=new AntWorld(data);
+        antworld.resetPic();
           System.out.println("draw");
-          antworld.setLocation(centerX, centerY);
+          //antworld.setLocation(-1500, -1755);
         
       }
       try

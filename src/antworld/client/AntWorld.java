@@ -37,165 +37,196 @@ public class AntWorld
 {
 
     //static Node[][] globalNodeMap;
-
-
-    public static Picture gameBoard;
-    static Point startClick = new Point(0, 0);
+  public static Picture gameBoard;
+    //static Point startClick = new Point(0, 0);
 
 //keeping track of the numer of turns
-    //add more catagories as needed. ie solder, medic etc.
-    /**
-     * @param args the command line arguments
-     */
-    public AntWorld(CommData data) throws IOException
+  //add more catagories as needed. ie solder, medic etc.
+  /**
+   * @param args the command line arguments
+   */
+  public AntWorld(CommData data) throws IOException
+  {
+    //globalNodeMap= buildMap(readImage());
+    NestData myNest = new NestData(NestNameEnum.ACORN, TeamNameEnum.Buffalograss, 0, 0);//
+    gameBoard = new Picture("AntWorld.png");
+    gameBoard.setResizable(true);
+    gameBoard.setSize(gameBoard.getImageWidth() / 2, gameBoard.getImageHeight() / 2);
+    gameBoard.setCenter(-1500, -1700);
+    gameBoard.addMouseMotionListener(new MouseMotionListener()
     {
-        //globalNodeMap= buildMap(readImage());
-        NestData myNest = new NestData(NestNameEnum.ACORN, TeamNameEnum.Buffalograss, 0, 0);//
-        gameBoard=new Picture("AntWorld.png");
-        gameBoard.setResizable(true);
-        gameBoard.setSize(gameBoard.getImageWidth()/2,gameBoard.getImageHeight()/2);
+      Point start;
+      Point dpPoint;
 
-        gameBoard.addMouseMotionListener(new MouseMotionListener()
-        {
-            Point start;
-            Point dpPoint;
+      @Override
+      public void mouseDragged(MouseEvent e)
+      {
+        int x = e.getX();
+        int y = e.getY();
+        gameBoard.setCenter(x - start.x, y - start.y);
+      }
 
-            @Override
-            public void mouseDragged(MouseEvent e)
-            {
-                int x = e.getX();
-                int y = e.getY();
-                gameBoard.setCenter(x - start.x, y - start.y);
-            }
+      @Override
+      public void mouseMoved(MouseEvent e)
+      {
 
-            @Override
-            public void mouseMoved(MouseEvent e)
-            {
+        dpPoint = gameBoard.getDrawPaneLocation();
+        start = new Point(e.getPoint().x - dpPoint.x, e.getPoint().y - dpPoint.y);
 
-                dpPoint = gameBoard.getDrawPaneLocation();
-                start = new Point(e.getPoint().x - dpPoint.x, e.getPoint().y - dpPoint.y);
+      }
 
-            }
+    });
 
+  }
 
-        });
+  public static int[][] readImage() throws IOException
+  {
+    File fle = new File("AntWorld.png");
+    BufferedImage img = ImageIO.read(fle);
+    Raster rstr = img.getData();
+    int imagearray[][] = new int[rstr.getWidth()][rstr.getHeight()];
+    int pixeldata[] = new int[3];
+    for (int i = 0; i < rstr.getWidth(); i++)
+    {
+      for (int j = 0; j < rstr.getHeight(); j++)
+      {
+        rstr.getPixel(i, j, pixeldata);
+        imagearray[i][j] = pixeldata[1];
+        // System.out.print(imagearray[i][j]);
+      }
+      // System.out.println("");
+    }
+    //build map as a list of nodes
+    return imagearray;
+
+  }
+
+  public void resetPic()
+  {
+    gameBoard.dispose();
+
+    //globalNodeMap= buildMap(readImage());
+    NestData myNest = new NestData(NestNameEnum.ACORN, TeamNameEnum.Buffalograss, 0, 0);//
+    gameBoard = new Picture("AntWorld.png");
+    gameBoard.setResizable(true);
+    gameBoard.setSize(gameBoard.getImageWidth() / 2, gameBoard.getImageHeight() / 2);
+    gameBoard.setCenter(-1500, -1700);
+    gameBoard.addMouseMotionListener(new MouseMotionListener()
+    {
+      Point start;
+      Point dpPoint;
+
+      @Override
+      public void mouseDragged(MouseEvent e)
+      {
+        int x = e.getX();
+        int y = e.getY();
+        gameBoard.setCenter(x - start.x, y - start.y);
+      }
+
+      @Override
+      public void mouseMoved(MouseEvent e)
+      {
+
+        dpPoint = gameBoard.getDrawPaneLocation();
+        start = new Point(e.getPoint().x - dpPoint.x, e.getPoint().y - dpPoint.y);
+
+      }
+
+    });
+
+  }
+
+  public void draw(CommData data)
+  {
+
+    gameBoard.refresh();
+    for (AntData ant : data.myAntList)
+    {
+      drawMyAnt(ant.gridX, ant.gridY);
+
+    }
+    for (AntData ant : data.enemyAntSet)
+    {
+      drawOtherAnt(ant.gridX, ant.gridY);
 
     }
 
-   
-
-
-
-    public static int[][] readImage() throws IOException
+    for (FoodData food : data.foodSet)
     {
-        File fle = new File("AntWorld.png");
-        BufferedImage img = ImageIO.read(fle);
-        Raster rstr = img.getData();
-        int imagearray[][] = new int[rstr.getWidth()][rstr.getHeight()];
-        int pixeldata[] = new int[3];
-        for (int i = 0; i < rstr.getWidth(); i++)
-        {
-            for (int j = 0; j < rstr.getHeight(); j++)
-            {
-                rstr.getPixel(i, j, pixeldata);
-                imagearray[i][j] = pixeldata[1];
-                // System.out.print(imagearray[i][j]);
-            }
-            // System.out.println("");
-        }
-        //build map as a list of nodes
-        return imagearray;
+      drawFood(food.gridX, food.gridY, food.foodType.getColor());
 
     }
 
+  }
 
+  public void drawFood(int x, int y, int argb)
+  {
+    int size = 4;
+    int r = (argb) & 0xFF;
+    int g = (argb >> 8) & 0xFF;
+    int b = (argb >> 16) & 0xFF;
 
-    public void draw(CommData data)
+    for (int i = 0; i < size; i++)
     {
+      for (int j = 0; j < size; j++)
+      {
 
-        gameBoard.refresh();
-        for (AntData ant : data.myAntList)
-        {
-            drawMyAnt(ant.gridX, ant.gridY);
-
-        }
-        for (AntData ant : data.enemyAntSet)
-        {
-            drawOtherAnt(ant.gridX, ant.gridY);
-
-        }
-
-        for (FoodData food : data.foodSet)
-        {
-            drawFood(food.gridX, food.gridY, food.foodType.getColor());
-
-        }
-
+        //gameBoard.setColor(x, y, color);
+        gameBoard.setRGB(x + i - size, y + j - size, r, g, b);
+      }
     }
 
-    public void drawFood(int x, int y, int argb)
+  }
+
+  public void drawOtherAnt(int x, int y)
+  {
+    int size = 4;
+    for (int i = 0; i < size; i++)
     {
-        int size = 4;
-        int r = (argb) & 0xFF;
-        int g = (argb >> 8) & 0xFF;
-        int b = (argb >> 16) & 0xFF;
+      for (int j = 0; j < size; j++)
+      {
 
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++)
-            {
-
-                //gameBoard.setColor(x, y, color);
-                gameBoard.setRGB(x + i - size, y + j - size, r, g, b);
-            }
-        }
-
+        gameBoard.setRGB(x + i - size, y + j - size, 0, 0, 0);
+      }
     }
 
-    public void drawOtherAnt(int x, int y)
+  }
+
+  public void drawMyAnt(int x, int y)
+  {
+    int size = 4;
+    for (int i = 0; i < size; i++)
     {
-        int size = 4;
-        for (int i = 0; i < size; i++)
+      for (int j = 0; j < size; j++)
+      {
+        //int blue=gameBoard.getBlue(x+i-size, y+j-size);
+        gameBoard.setRGB(x + i - size, y + j - size, 255, 255, 255);
+        if ((j > 0) && (j + 1 < size) && (i > 1) && (i + 1 < size))
         {
-            for (int j = 0; j < size; j++)
-            {
-
-                gameBoard.setRGB(x + i - size, y + j - size, 0, 0, 0);
-            }
+          gameBoard.setRGB(x + i - size, y + j - size, 0, 200, 200);
         }
-
+      }
     }
 
-    public void drawMyAnt(int x, int y)
-    {
-        int size = 4;
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++)
-            {
-                //int blue=gameBoard.getBlue(x+i-size, y+j-size);
-                gameBoard.setRGB(x + i - size, y + j - size, 255, 255, 255);
-                if((j>0)&&(j+1<size)&&(i>1)&&(i+1<size))gameBoard.setRGB(x + i - size, y + j - size, 0, 200, 200);
-            }
-        }
+  }
 
-    }
-
-    public void drawMapPixel(int x, int y, int hVal)
+  public void drawMapPixel(int x, int y, int hVal)
+  {
+    int size = 3;
+    for (int i = 0; i < size; i++)
     {
-        int size = 3;
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++)
-            {
-                gameBoard.setRGB(x + i - size, y + j - size, 255 - (hVal % 255), (hVal % 255), 0);                
-            }
-        }
+      for (int j = 0; j < size; j++)
+      {
+        gameBoard.setRGB(x + i - size, y + j - size, 255 - (hVal % 255), (hVal % 255), 0);
+      }
     }
-    
-    public void setLocation(int x, int y){
-    
+  }
+
+  public void setLocation(int x, int y)
+  {
+
     gameBoard.setLocation(x, y);
-    }
+  }
 
 }

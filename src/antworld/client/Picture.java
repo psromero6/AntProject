@@ -371,11 +371,15 @@ public class Picture extends JFrame implements ComponentListener
   }
   
   public void setCenter(int x, int y){
-
+System.out.println(x+";"+y);
 drawPane.setLocation(x, y);
  
   
   }
+  
+ 
+  
+  
   public void refresh(){
   // offScreenImage.flush();
     
