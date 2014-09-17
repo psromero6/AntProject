@@ -205,11 +205,12 @@ public class ClientRandomWalk
 //        }
     // drawAnts(data);
     while (true)
-    {
-      if (DRAW&&(data.gameTick%5==0))
+    {antworld.draw(data);
+      if (DRAW&&(data.gameTick%50==0))
       {
+          antworld=new AntWorld(data);
           System.out.println("draw");
-        antworld.draw(data);
+        
       }
       try
       {
