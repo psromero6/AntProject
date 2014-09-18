@@ -34,6 +34,7 @@ public class ClientRandomWalk
   private static final boolean DRAW =true;
   private static final boolean DRAWTASK =true;
   private static final boolean BUILD = false;
+  private boolean threadintest = true;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
   static ClientRandomWalk myClient;//package private?
@@ -428,6 +429,11 @@ public class ClientRandomWalk
             float homeishy=(getCenterY()+10*(random.nextFloat()-0.5f));
             float homeishx=(getCenterX()+10*(random.nextFloat()-0.5f));
             NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
+            
+            
+           // PathThread path=new PathThread(currentNode,Control.myMap.get((int)homeishy).get((int)homeishx));
+           //if(threadintest) path.run();
+           //threadintest=false;
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get((int)homeishy).get((int)homeishx)));
             
             commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.DROP));
@@ -461,8 +467,8 @@ public class ClientRandomWalk
     
     
   }
-    if(BUILD){
-   if(data.foodStockPile[3]>20000){
+    if(BUILD||data.myAntList.size()<100){
+   if(data.foodStockPile[3]>1000){
   AntData attackAnt=new AntData(Constants.UNKNOWN_ANT_ID, AntType.ATTACK, data.myNest, data.myTeam);
   attackAnt.myAction=new AntAction(AntActionType.BIRTH); 
   data.myAntList.add(attackAnt);
@@ -862,7 +868,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       Collections.sort(targets,myDistComp);//sortedAntList now sorted
       
       
-      
+      if(!targets.isEmpty())  {
       AntData target=targets.get(0);
       targets.remove(0);
 
@@ -870,6 +876,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       commandAnts.commandMap.put(ant.id, bline.findPath(currentNode,  Control.myMap.get(target.gridY).get(target.gridX)));
       commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.ATTACK));
    
+   }
    }
    }
   private void collectWater(CommData data)
@@ -1079,7 +1086,9 @@ if(e.isControlDown()&&e.getKeyCode()==VK_X)      myClient.closeAll();
   }
   
   
-  
+  public static boolean doDraw(){
+  return DRAW;
+  }
   
   
   
