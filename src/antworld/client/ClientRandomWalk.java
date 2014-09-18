@@ -31,7 +31,7 @@ public class ClientRandomWalk
   private static final boolean DEBUG = false;
   private static final boolean TRACKACTION = false;
   private static final boolean SCOREING = true;
-  private static final boolean DRAW = true;
+  private static final boolean DRAW = false;
   private static final boolean BUILD = false;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
@@ -205,7 +205,7 @@ public class ClientRandomWalk
 //        }
     // drawAnts(data);
     while (true)
-    {antworld.draw(data);
+    {if(DRAW)antworld.draw(data);
       if (DRAW&&(data.gameTick%150==0))
       {
         antworld.resetPic();
@@ -754,38 +754,45 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
   
   private void collectWater(CommData data)
     {
-        System.out.println("getting water");
-      ArrayList<AntData> antListToCollectWater=new ArrayList<AntData>();
-      NodeData closestWaterNode=Control.myMap.get(2382).get(2064);//consider making this an algorithm, this is closest to Bullet base
+        
+       if(TRACKACTION)  System.out.println("getting Food");
+      ArrayList<AntData> antListToCollectFood=new ArrayList<AntData>();
+      NodeData closestfoodNode=Control.myMap.get(2382).get(2064);//consider making this an algorithm, this is closest to Bullet base
       ArrayList<AntData> mySortedAntList=data.myAntList;//
       DistanceCompare myDistComp=new DistanceCompare();//SET the compare node in this class!!!      
-      int numberOfAntsToCollectWater=10;
-      myDistComp.goalNode=closestWaterNode;//now it is set
+      int numberOfAntsToCollectfood=1;
+      myDistComp.goalNode=closestfoodNode;//now it is set
       
       Collections.sort(mySortedAntList,myDistComp);//sortedAntList now sorted
       
-      while(antListToCollectWater.size()<0)
-      {
-        antListToCollectWater.remove(0);//make sure ant list is empty before beginning
+ 
+      boolean getAnt;
+      int j;
+      for(int i=0;i<numberOfAntsToCollectfood;i++)
+      { getAnt=true;
+        j=0;
+          while(getAnt&&(i+j)<mySortedAntList.size()){
+              AntData ant=mySortedAntList.get(i+j);
+        // System.out.println((commandAnts.questMapping==null)+";"+(commandAnts.questMapping.isEmpty())+";"+(commandAnts.questMapping.get(ant.id)==null)+";"+(commandAnts.questMapping.get(ant.id).type));
+          if(ant.myAction.type!=AntActionType.BIRTH&&(commandAnts.questMapping==null||commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type)==AntActionType.MOVE))
+          {
+              antListToCollectFood.add(ant);
+             if(TRACKACTION)  System.out.println("assign this ant");
+              getAnt=false;
+          }
+          j++;
+          }
+          
       }
-      int j=0;
-      for(int i=0;i<numberOfAntsToCollectWater;i++)
-      {
-          AntAction currentquest=commandAnts.questMapping.get(antListToCollectWater.get(i+j));
-          if(currentquest==null||currentquest.type==AntActionType.MOVE)
-        antListToCollectWater.add(mySortedAntList.get(i+j));
-          else j++;
-      }
-      if(antListToCollectWater.size()!=numberOfAntsToCollectWater)
-      {
-     if(TRACKACTION)    System.out.println("wrong number of ants to collect water");
-      }
+    
       //now we have 10 ants closest to water
-      for (AntData ant : antListToCollectWater)
+      for (AntData ant : antListToCollectFood)
       {
           commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.PICKUP));
-        commandAnts.commandMap.put(ant.id, commandAnts.collectFood(ant,closestWaterNode));//tells the ants to collect the water
+        commandAnts.commandMap.put(ant.id, commandAnts.collectFood(ant,closestfoodNode));//tells the ants to collect the water
       }
+      
+    
     }
   
   
