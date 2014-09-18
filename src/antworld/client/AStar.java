@@ -3,20 +3,13 @@ package antworld.client;
 
 import antworld.data.AntAction;
 import antworld.data.AntAction.AntActionType;
-import java.awt.FlowLayout;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 
 
-public class AStar
+public class AStar 
 {
 
     public static ArrayList<ArrayList<NodeData>> myMap = Control.myMap;
@@ -27,6 +20,12 @@ public class AStar
     NodeData startLoc;
     NodeData goalLoc;
 
+    
+    
+  
+    
+    
+    
   ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
     public AStar()
@@ -73,7 +72,7 @@ public class AStar
             neighborList = updateNeighborVal(neighborList, currentNode, goalLoc);
             neighborList = compareNeighborList(neighborList, openList);//remove duplicate
             neighborList = compareNeighborList(neighborList, closedList);
-            drawOpenList(closedList);
+         if( ClientRandomWalk.doDraw())  drawOpenList(closedList);
             
             if(closedList.size()>27)//debug
             {
@@ -437,7 +436,7 @@ public class AStar
             int currRow = currentNode.getRowID();
             int currCol = currentNode.getColID();
             int currH = currentNode.getH();
-            ClientRandomWalk.myClient.antworld.drawMapPixel(currCol, currRow, currH);
+           ClientRandomWalk.myClient.antworld.drawMapPixel(currCol, currRow, currH);
             //antworld.drawAnt(currCol,currRow);
         }
     }

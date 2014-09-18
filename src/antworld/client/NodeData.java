@@ -2,6 +2,10 @@ package antworld.client;
 
 
 
+import antworld.data.LandType;
+import java.awt.Color;
+import java.awt.image.Raster;
+import java.util.Arrays;
 import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.Referenceable;
@@ -15,19 +19,26 @@ public class NodeData
   private int h_heuristic;
   private int g_movecost;
   private int f_value;
-  
+  private int[] color;
   private int elevation;//included for printing purposes
   //private boolean startLoc=false;
   //private boolean goalLoc=false;
   private NodeData parentNode;
   private NodeData tentativeParentNode;
   
-  public NodeData(int row, int col, int green)
+  public NodeData(int row, int col, int green)//int[] colorin)
   {
     //TODO are these in the right order (row,col)?
    rowID=row;
    colID=col;
+   //color=colorin;
+   //if (Arrays.equals(RGB(LandType.WATER.getMapColor()),(colorin))){
+   
+  // elevation=Integer.MAX_VALUE;
+  // }
+  // else{
    elevation=green;
+  // }
   }
   
   public void setParent(NodeData child)
@@ -61,6 +72,18 @@ public class NodeData
     }
     return base_movecost;
   }
+  
+  
+  public static int[] RGB(int rgb){
+      
+  int r = (rgb)&0xFF;
+int g = (rgb>>8)&0xFF;
+int b = (rgb>>16)&0xFF;
+  int[] rgbMat={r,g,b};
+  return rgbMat;
+  }
+  
+  
   
   public void calcG(NodeData startLoc)//will require access to parent node
   {

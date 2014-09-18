@@ -17,6 +17,7 @@ public class BLine
 {
   public static ArrayList<ArrayList<NodeData>> myMap = Control.myMap;
   
+  private static final boolean DRAWLINES = true;
   public BLine()
   {
   }
@@ -78,9 +79,9 @@ public class BLine
     //  action.direction=getDir.returnDirEnum(dirX, dirY);
       
       
-      //currentNode=myMap.get(currentRow).get(currentCol);
+      currentNode=myMap.get(currentRow).get(currentCol);
 //      System.out.println("goalNode=("+currentRow+","+currentCol+")");
-      //drawStep(currentNode);
+   if(DRAWLINES) drawStep(currentNode);
         //System.out.println("start delta:"+(goalRow - startRow)+";"+(goalCol - startCol)+"running sign"+deltaColSign+";"+deltaRowSign+"calculating dir with"+dirX+";"+dirY+" what is left is:"+deltaCol+";"+deltaRow);
         
       moveList.add(new AntAction(AntAction.AntActionType.MOVE, GetDirection.returnDirEnum(dirX, dirY)));
@@ -99,7 +100,7 @@ public class BLine
     int currCol = currentNode.getColID();
     int currH = 255;//Hvalue will not be populated for BLine
    // ClientRandomWalk.myClient.antworld.gameBoard.setCenter(currCol, currRow);
-    //ClientRandomWalk.myClient.antworld.drawMapPixel(currCol, currRow, currH);
+  if(ClientRandomWalk.doDraw())  ClientRandomWalk.myClient.antworld.drawMapPixel(currCol, currRow, currH);
     
   }
 }

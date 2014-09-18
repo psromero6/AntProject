@@ -54,7 +54,7 @@ public class ClientRandomWalk
   private int[] boomRGB={255,0,0};
   private int[] stalkRGB={0,0,255};
   private int[] carryRGB={0,125,125};
-
+  private AntData[] waterFetchers;
   public ClientRandomWalk(String host, int portNumber) throws IOException
   {
     System.out.println("Starting ClientRandomWalk: " + System.currentTimeMillis());
@@ -457,7 +457,7 @@ public class ClientRandomWalk
     }
     goHome=false;
     
-    if(data.foodStockPile[1]<200) collectWater(data);
+    if(data.foodStockPile[1]<200&&data.gameTick%1000==0) collectWater(data);
 
     
     
@@ -887,7 +887,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       NodeData closestfoodNode=Control.myMap.get(2382).get(2064);//consider making this an algorithm, this is closest to Bullet base
       ArrayList<AntData> mySortedAntList=data.myAntList;//
       DistanceCompare myDistComp=new DistanceCompare();//SET the compare node in this class!!!      
-      int numberOfAntsToCollectfood=1;
+      int numberOfAntsToCollectfood=10;
       myDistComp.goalNode=closestfoodNode;//now it is set
       
       Collections.sort(mySortedAntList,myDistComp);//sortedAntList now sorted
@@ -898,7 +898,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       for(int i=0;i<numberOfAntsToCollectfood;i++)
       { getAnt=true;
         j=0;
-          while(getAnt&&(i+j)<mySortedAntList.size()){
+          while(getAnt&&((i+j)<mySortedAntList.size())){
               AntData ant=mySortedAntList.get(i+j);
         // System.out.println((commandAnts.questMapping==null)+";"+(commandAnts.questMapping.isEmpty())+";"+(commandAnts.questMapping.get(ant.id)==null)+";"+(commandAnts.questMapping.get(ant.id).type));
           if(ant.myAction.type!=AntActionType.BIRTH&&(commandAnts.questMapping==null||commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type)==AntActionType.MOVE))

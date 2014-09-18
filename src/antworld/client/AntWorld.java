@@ -38,6 +38,7 @@ public class AntWorld
 
     //static Node[][] globalNodeMap;
   public static Picture gameBoard;
+ // ArrayList<NodeData> paintNodes=new ArrayList<>();
     //static Point startClick = new Point(0, 0);
 
 //keeping track of the numer of turns
@@ -48,7 +49,8 @@ public class AntWorld
   public AntWorld(CommData data) throws IOException
   {
     //globalNodeMap= buildMap(readImage());
-    NestData myNest = new NestData(NestNameEnum.ACORN, TeamNameEnum.Buffalograss, 0, 0);//
+      
+    //NestData myNest = new NestData(NestNameEnum.ACORN, TeamNameEnum.Buffalograss, 0, 0);//
     gameBoard = new Picture("AntWorld.png");
     gameBoard.setResizable(true);
     gameBoard.setSize(gameBoard.getImageWidth() / 2, gameBoard.getImageHeight() / 2);
@@ -173,6 +175,7 @@ public class AntWorld
       {
 
         //gameBoard.setColor(x, y, color);
+         // paintNodes.add(Control.myMap.get(j).get(i));
         gameBoard.setRGB(x + i - size, y + j - size, r, g, b);
       }
     }
@@ -190,7 +193,8 @@ gameBoard.setRGB(x + i - size, y + j - size, 0, 0, 0);
 if ((j > 0) && (j + 1 < size) && (i > 0) && (i + 1 < size)) 
 { 
 gameBoard.setRGB(x + i - size, y + j - size, 0, 200, 200); 
-} 
+}
+//paintNodes.add(Control.myMap.get(j).get(i));
 } 
 } 
 } 
@@ -207,27 +211,57 @@ gameBoard.setRGB(x + i - size, y + j - size, 255, 255, 255);
 if ((j > 0) && (j + 1 < size) && (i > 0) && (i + 1 < size)) 
 { 
 gameBoard.setRGB(x + i - size, y + j - size, 255, 0, 0); 
-} 
+}
+//paintNodes.add(Control.myMap.get(j).get(i));
 } 
 } 
 } 
 
   public void drawMapPixel(int x, int y, int hVal)
   {
-    int size = 3;
+    int size = 1;
     for (int i = 0; i < size; i++)
     {
       for (int j = 0; j < size; j++)
       {
+       //   paintNodes.add(Control.myMap.get(j).get(i));
         gameBoard.setRGB(x + i - size, y + j - size, 255 - (hVal % 255), (hVal % 255), 0);
       }
     }
   }
-
+ public void drawMapCircle(int x, int y, int[] RGB)
+  {
+    int size = 6;
+    for (int i = 0; i < size; i++)
+    {
+      for (int j = 0; j < size; j++)
+      {
+       if(Math.abs(i+j)>=6) gameBoard.setRGB(x + i - size, y + j - size, RGB[0], RGB[1], RGB[2]);
+      // paintNodes.add(Control.myMap.get(j).get(i));
+      }
+    }
+  }
   public void setLocation(int x, int y)
   {
 
     gameBoard.setLocation(x, y);
   }
 
-}
+//  public void flash(){
+//  for(NodeData node:paintNodes){
+//  int x=node.colID;
+//  int y=node.rowID;
+//  
+//  //node.
+//  
+// // gameBoard.setRGB(x , y , 255 - (hVal % 255), (hVal % 255), 0);
+//  }
+  
+  
+  
+  }
+  
+  
+  
+  
+
