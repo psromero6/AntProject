@@ -179,37 +179,38 @@ public class AntWorld
 
   }
 
-  public void drawOtherAnt(int x, int y)
-  {
-    int size = 4;
-    for (int i = 0; i < size; i++)
-    {
-      for (int j = 0; j < size; j++)
-      {
+  public void drawOtherAnt(int x, int y) 
+{ 
+int size = 3; 
+for (int i = 0; i < size; i++) 
+{ 
+for (int j = 0; j < size; j++) 
+{ 
+gameBoard.setRGB(x + i - size, y + j - size, 0, 0, 0); 
+if ((j > 0) && (j + 1 < size) && (i > 0) && (i + 1 < size)) 
+{ 
+gameBoard.setRGB(x + i - size, y + j - size, 0, 200, 200); 
+} 
+} 
+} 
+} 
 
-        gameBoard.setRGB(x + i - size, y + j - size, 0, 0, 0);
-      }
-    }
-
-  }
-
-  public void drawMyAnt(int x, int y)
-  {
-    int size = 4;
-    for (int i = 0; i < size; i++)
-    {
-      for (int j = 0; j < size; j++)
-      {
-        //int blue=gameBoard.getBlue(x+i-size, y+j-size);
-        gameBoard.setRGB(x + i - size, y + j - size, 255, 255, 255);
-        if ((j > 0) && (j + 1 < size) && (i > 1) && (i + 1 < size))
-        {
-          gameBoard.setRGB(x + i - size, y + j - size, 0, 200, 200);
-        }
-      }
-    }
-
-  }
+public void drawMyAnt(int x, int y) 
+{ 
+int size = 3; 
+for (int i = 0; i < size; i++) 
+{ 
+for (int j = 0; j < size; j++) 
+{ 
+//int blue=gameBoard.getBlue(x+i-size, y+j-size); 
+gameBoard.setRGB(x + i - size, y + j - size, 255, 255, 255); 
+if ((j > 0) && (j + 1 < size) && (i > 0) && (i + 1 < size)) 
+{ 
+gameBoard.setRGB(x + i - size, y + j - size, 255, 0, 0); 
+} 
+} 
+} 
+} 
 
   public void drawMapPixel(int x, int y, int hVal)
   {
