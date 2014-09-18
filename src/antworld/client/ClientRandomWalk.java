@@ -382,7 +382,7 @@ public class ClientRandomWalk
         
         
         
-        if(ant.carryUnits>0&&nestDistance<10){
+        if(ant.carryUnits>0&&nestDistance<19){
       if(SCOREING) System.out.println("Drop it sucka");
         AntAction dropaction=new AntAction(AntActionType.DROP);
         dropaction.direction=Direction.getRandomDir();
@@ -391,7 +391,7 @@ public class ClientRandomWalk
         }
         
         
-        else if(ant.health<10&&nestDistance<10&&!ant.underground){
+        else if(ant.health<10&&nestDistance<19&&!ant.underground){
          if(SCOREING) System.out.println("GetDown");
          AntAction duckaction=new AntAction(AntActionType.ENTER_NEST);
          ant.myAction=duckaction;
@@ -409,7 +409,10 @@ public class ClientRandomWalk
         if(ant.carryUnits>0&&(commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type!=AntActionType.DROP)))
         {
             if(TRACKACTION) System.out.println("I have grub.........................................");
-            NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
+            //home location varries to prevent ant pile-ups
+            float homeishy=(ant.gridY+19*(random.nextFloat()-1.0f));
+            float homeishx=(ant.gridX+19*(random.nextFloat()-1.0f));
+            NodeData currentNode=Control.myMap.get((int)homeishy).get((int)homeishy);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, homeNode));
             
             commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.DROP));
