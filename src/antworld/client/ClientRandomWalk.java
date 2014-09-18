@@ -22,6 +22,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
@@ -31,9 +32,9 @@ public class ClientRandomWalk
   private static final boolean DEBUG = false;
   private static final boolean TRACKACTION = false;
   private static final boolean SCOREING = true;
-  private static final boolean DRAW =false;
-  private static final boolean DRAWTASK =false;
-  private static final boolean BUILD = false;
+  private static final boolean DRAW =true;
+  private static final boolean DRAWTASK =true;
+  private static final boolean BUILD = true;
   private boolean threadintest = true;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
@@ -54,7 +55,10 @@ public class ClientRandomWalk
   private int[] boomRGB={255,0,0};
   private int[] stalkRGB={0,0,255};
   private int[] carryRGB={0,125,125};
-  private AntData[] waterFetchers;
+  private ArrayList<NodeData> sweetSpotInt;
+  private HashMap<NodeData,Integer> sweetSpots;
+  
+  
   public ClientRandomWalk(String host, int portNumber) throws IOException
   {
     System.out.println("Starting ClientRandomWalk: " + System.currentTimeMillis());
@@ -196,7 +200,11 @@ public class ClientRandomWalk
  System.out.println("controlStop");
     commandAnts = new ActionQueue(data);
  System.out.println("actionlQueue made");
+ sweetSpotInt=new ArrayList<>();
  
+ NodeData knownsweet=myControl.myMap.get(2016).get(2064);
+ sweetSpotInt.add(knownsweet);
+ //sweetSpots.put(myControl.myMap.get(2016).get(2064),1);
  
  antsToKill=new ArrayList<>();
  
@@ -273,7 +281,11 @@ public class ClientRandomWalk
        }
         for(FoodData fd : myFoodArray){
            // System.out.println(fd.foodType+";"+fd.gridX+";"+fd.gridY);
-            if((oldFood.isEmpty()||oldFood.contains(fd)||(data.gameTick%150==0))&&fd.foodType!=FoodType.WATER)collectFood(myFoodArray,data);
+            if((oldFood.isEmpty()||oldFood.contains(fd)||(data.gameTick%150==0))&&fd.foodType!=FoodType.WATER){
+               NodeData foodSpot=Control.myMap.get(fd.gridY).get(fd.gridX);
+                if(!sweetSpotInt.contains(foodSpot)){sweetSpotInt.add(foodSpot);}
+                collectFood(myFoodArray,data);
+            }
             
             
         }
@@ -467,8 +479,8 @@ public class ClientRandomWalk
     
     
   }
-    if(BUILD||data.myAntList.size()<100){
-   if(data.foodStockPile[3]>1000){
+    if(BUILD&&data.myAntList.size()<250){
+   if(data.foodStockPile[3]>100){
   AntData attackAnt=new AntData(Constants.UNKNOWN_ANT_ID, AntType.ATTACK, data.myNest, data.myTeam);
   attackAnt.myAction=new AntAction(AntActionType.BIRTH); 
   data.myAntList.add(attackAnt);
@@ -476,6 +488,12 @@ public class ClientRandomWalk
   }
   if(data.foodStockPile[4]>100){
   AntData speedAnt=new AntData(Constants.UNKNOWN_ANT_ID, AntType.SPEED, data.myNest, data.myTeam);
+  speedAnt.myAction=new AntAction(AntActionType.BIRTH); 
+  data.myAntList.add(speedAnt);
+   
+  }
+  if(data.foodStockPile[7]>100){
+  AntData speedAnt=new AntData(Constants.UNKNOWN_ANT_ID, AntType.MEDIC, data.myNest, data.myTeam);
   speedAnt.myAction=new AntAction(AntActionType.BIRTH); 
   data.myAntList.add(speedAnt);
    
@@ -695,10 +713,10 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
           if(isObstructed(ant,data)){
              randomTrack(ant);
          }
-        if(Math.abs(centerX - ant.gridX) + Math.abs(centerY - ant.gridY) > 150){
+        if(0.9*Math.abs(centerX - ant.gridX) + 1.1*Math.abs(centerY - ant.gridY) > 300){
         NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
-            commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.ENTER_NEST));
+            commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.EXIT_NEST));
         }
           
           
@@ -801,7 +819,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
           while(getAnt&&(i+j)<mySortedAntList.size()){
               AntData ant=mySortedAntList.get(i+j);
         // System.out.println((commandAnts.questMapping==null)+";"+(commandAnts.questMapping.isEmpty())+";"+(commandAnts.questMapping.get(ant.id)==null)+";"+(commandAnts.questMapping.get(ant.id).type));
-          if(ant.myAction.type!=AntActionType.BIRTH&&(commandAnts.questMapping==null||commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type)==AntActionType.MOVE))
+          if(ant.myAction.type!=AntActionType.BIRTH&&(commandAnts.questMapping==null||commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type)==AntActionType.MOVE||commandAnts.questMapping.get(ant.id).type==AntActionType.ENTER_NEST))
           {
               antListToCollectFood.add(ant);
              if(TRACKACTION)  System.out.println("assign this ant");
@@ -899,7 +917,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       NodeData closestfoodNode=Control.myMap.get(2382).get(2064);//consider making this an algorithm, this is closest to Bullet base
       
       //ArrayList<AntData> mySortedAntList=data.myAntList;//
-      int numberOfAntsToCollectfood=10;
+      int numberOfAntsToCollectfood=Math.min(2, (int) data.myAntList.size()/10);
       int i=0;
       for(AntData ant : data.myAntList)//for each up until numberOfAntsToCOllectFood
       {
@@ -974,6 +992,17 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
 
   public void randomTrack(AntData ant)
   {
+      BLine bline=new BLine();
+      if (random.nextDouble()<0.3){
+          NodeData location=sweetSpotInt.get( (int) random.nextDouble()*sweetSpotInt.size());
+     // int prob =sweetSpots.get(random.nextDouble()*sweetSpots.size());
+      commandAnts.commandMap.put(ant.id,bline.findPath( Control.myMap.get(ant.gridY).get(ant.gridX), location));
+      commandAnts.questMapping.put(ant.id,new AntAction(AntActionType.MOVE));
+      }
+      else{
+          
+      
+      
       
     AntAction action = new AntAction(AntActionType.MOVE);
    
@@ -984,7 +1013,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
     
       
     commandAnts.questMapping.put(ant.id,action);
-  
+      }
 
   }
 
