@@ -436,7 +436,7 @@ public class ClientRandomWalk
     }
     goHome=false;
     
-    if(data.foodStockPile[1]<2000) collectWater(data);
+    if(data.foodStockPile[1]<200) collectWater(data);
 
     
     
