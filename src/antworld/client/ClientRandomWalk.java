@@ -31,8 +31,8 @@ public class ClientRandomWalk
   private static final boolean DEBUG = false;
   private static final boolean TRACKACTION = false;
   private static final boolean SCOREING = true;
-  private static final boolean DRAW =true;
-  private static final boolean DRAWTASK =true;
+  private static final boolean DRAW =false;
+  private static final boolean DRAWTASK =false;
   private static final boolean BUILD = false;
   private boolean threadintest = true;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
@@ -43,7 +43,7 @@ public class ClientRandomWalk
   private ObjectInputStream inputStream = null;
   private ObjectOutputStream outputStream = null;
   private boolean isConnected = false;
-  private boolean goHome=false;
+  private boolean goHome=true;
   private NestNameEnum myNestName = null;
   private int centerX, centerY;
   private int[] solidFood;
@@ -411,7 +411,7 @@ public class ClientRandomWalk
             commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.ENTER_NEST));
         }
         
-        else if(getObstructedDir(ant,antsToKill)!=null){
+        else if(getObstructedDir(ant,antsToKill)!=null&&ant.carryUnits==0){
         
         AntAction driveBy=new AntAction(AntActionType.ATTACK);
         driveBy.direction=getObstructedDir(ant,antsToKill);
@@ -691,12 +691,20 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
       }
       else if((commandAnts.questMapping.get(ant.id).type == AntActionType.MOVE)){
         //  System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
-         if(isObstructed(ant,data)){
+
+          if(isObstructed(ant,data)){
              randomTrack(ant);
          }
-       
-         else{ return commandAnts.questMapping.get(ant.id);
-         }
+        if(Math.abs(centerX - ant.gridX) + Math.abs(centerY - ant.gridY) > 150){
+        NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
+            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
+            commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.ENTER_NEST));
+        }
+          
+          
+          
+          return commandAnts.questMapping.get(ant.id);
+         
       
       }else if((commandAnts.questMapping.get(ant.id).type == AntActionType.DROP)){
         //  System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
@@ -733,14 +741,16 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
           if(commandAnts.commandMap.get(ant.id).isEmpty())attackIntruders(ant,antsToKill);
          return commandAnts.commandMap.get(ant.id).pop();
       }
-        
+      else if((commandAnts.questMapping.get(ant.id).type == AntActionType.ATTACK)){
+        return commandAnts.commandMap.get(ant.id).pop();
+      
+      
+      
+      
+      }
         
     }   
-    if(Math.abs(centerX - ant.gridX) + Math.abs(centerY - ant.gridY) > 700&& (commandAnts.questMapping.get(ant.id)!=null&&commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE)){
-        NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
-            commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
-            commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.MOVE));
-    }
+   
     
     myActionQueue = commandAnts.commandMap.get(ant.id);//returns actionQueue
     //commandAnts.updateActionQueue(ant);
@@ -770,8 +780,9 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
    private void collectFood(FoodData[] food, CommData data)
     {
         for(FoodData fd : food){
+            if(fd.getCount()<6&&fd.foodType==FoodType.BASIC) continue;
        if(TRACKACTION)  System.out.println("getting Food");
-      if((Math.abs(fd.gridX-getCenterX())+Math.abs(fd.gridY-getCenterY()))<700){
+      if((Math.abs(fd.gridX-getCenterX())+Math.abs(fd.gridY-getCenterY()))<200){
       ArrayList<AntData> antListToCollectFood=new ArrayList<AntData>();
       NodeData closestfoodNode=Control.myMap.get(fd.gridY).get(fd.gridX);//consider making this an algorithm, this is closest to Bullet base
       ArrayList<AntData> mySortedAntList=data.myAntList;//
