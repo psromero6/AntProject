@@ -879,46 +879,29 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
    }
    }
    }
+   
+   
   private void collectWater(CommData data)
-    {
-        
-       if(TRACKACTION)  System.out.println("getting Food");
+    {        
+       if(TRACKACTION)  System.out.println("getting Water");
       ArrayList<AntData> antListToCollectFood=new ArrayList<AntData>();
       NodeData closestfoodNode=Control.myMap.get(2382).get(2064);//consider making this an algorithm, this is closest to Bullet base
-      ArrayList<AntData> mySortedAntList=data.myAntList;//
-      DistanceCompare myDistComp=new DistanceCompare();//SET the compare node in this class!!!      
+      
+      //ArrayList<AntData> mySortedAntList=data.myAntList;//
       int numberOfAntsToCollectfood=10;
-      myDistComp.goalNode=closestfoodNode;//now it is set
+      int i=0;
+      for(AntData ant : data.myAntList)//for each up until numberOfAntsToCOllectFood
+      {
+        antListToCollectFood.add(ant);
+        i++;
+        if(i==numberOfAntsToCollectfood)break;
+      }      
       
-      Collections.sort(mySortedAntList,myDistComp);//sortedAntList now sorted
-      
- 
-      boolean getAnt;
-      int j;
-      for(int i=0;i<numberOfAntsToCollectfood;i++)
-      { getAnt=true;
-        j=0;
-          while(getAnt&&((i+j)<mySortedAntList.size())){
-              AntData ant=mySortedAntList.get(i+j);
-        // System.out.println((commandAnts.questMapping==null)+";"+(commandAnts.questMapping.isEmpty())+";"+(commandAnts.questMapping.get(ant.id)==null)+";"+(commandAnts.questMapping.get(ant.id).type));
-          if(ant.myAction.type!=AntActionType.BIRTH&&(commandAnts.questMapping==null||commandAnts.questMapping.isEmpty()||commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type)==AntActionType.MOVE))
-          {
-              antListToCollectFood.add(ant);
-             if(TRACKACTION)  System.out.println("assign this ant");
-              getAnt=false;
-          }
-          j++;
-          }
-          
-      }
-    
-      //now we have 10 ants closest to water
       for (AntData ant : antListToCollectFood)
       {
           commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.PICKUP));
         commandAnts.commandMap.put(ant.id, commandAnts.collectFood(ant,closestfoodNode));//tells the ants to collect the water
-      }
-      
+      }      
     
     }
   
