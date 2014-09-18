@@ -31,7 +31,7 @@ public class ClientRandomWalk
   private static final boolean DEBUG = false;
   private static final boolean TRACKACTION = false;
   private static final boolean SCOREING = true;
-  private static final boolean DRAW = false;
+  private static final boolean DRAW =true;
   private static final boolean BUILD = false;
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
@@ -47,6 +47,7 @@ public class ClientRandomWalk
   private int[] solidFood;
   private Socket clientSocket;
   private ArrayList<FoodData> oldFood;
+  private ArrayList<AntData> antsToKill;
   private static Random random = Constants.random;
 
   public ClientRandomWalk(String host, int portNumber) throws IOException
@@ -190,6 +191,23 @@ public class ClientRandomWalk
  System.out.println("controlStop");
     commandAnts = new ActionQueue(data);
  System.out.println("actionlQueue made");
+ 
+ 
+ antsToKill=new ArrayList<>();
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
     //antworld.setLocation(centerX, centerX);
     //testing with initalizing actions psr
     AntAction action = new AntAction(AntActionType.STASIS);
@@ -256,6 +274,17 @@ public class ClientRandomWalk
         }
         oldFood.clear();
         oldFood.addAll(food);
+        
+        
+       for(AntData ant : data.enemyAntSet){
+           // System.out.println(fd.foodType+";"+fd.gridX+";"+fd.gridY);
+            if((antsToKill.isEmpty()||antsToKill.contains(ant)||(data.gameTick%150==0)))
+                antsToKill.add(ant);
+        }
+        
+        
+        
+        
         
         
         
@@ -429,8 +458,11 @@ public class ClientRandomWalk
   }
     }
   for(AntData dickAnt: data.enemyAntSet){
-  if(dickAnt.myAction.type==AntActionType.ATTACK)System.out.println("enemy ant attack!!!!!!!!!!!!!!!!");
-  
+      //System.out.println(dickAnt.myAction.type);
+  if(dickAnt.myAction.type==AntActionType.ATTACK){
+      System.out.println("enemy ant attack!!!!!!!!!!!!!!!!");
+      attackIntruders(data,antsToKill);
+  }
   }
   
   
@@ -571,7 +603,7 @@ if((ant.health<10)&&(commandAnts.questMapping.get(ant.id)==null||commandAnts.que
     
     
    
-    if(true){
+   
 if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id).isEmpty()||commandAnts.questMapping.get(ant.id)==null||commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE){
     for (FoodData f : myFoodArray)
     {
@@ -592,7 +624,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
         //else keep doing the quest you were doing
       }
     }
-}}
+}
     
     
     
@@ -660,11 +692,24 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
             action= commandAnts.commandMap.get(ant.id).pop();
          // System.out.println(action);
       return action;
+      }else if((commandAnts.questMapping.get(ant.id).type == AntActionType.ATTACK)){
+          
+        
+          
+          if(getObstructedDir(ant,antsToKill)!=null){
+          action.type=AntActionType.ATTACK;
+          action.direction=getObstructedDir(ant,antsToKill);
+          return action;
+          
+          
+          }
+          if(commandAnts.commandMap.get(ant.id).isEmpty())attackIntruders(ant,antsToKill);
+         return commandAnts.commandMap.get(ant.id).pop();
       }
         
         
     }   
-    if(Math.abs(centerX - ant.gridX) + Math.abs(centerY - ant.gridY) > 700&& (commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE)){
+    if(Math.abs(centerX - ant.gridX) + Math.abs(centerY - ant.gridY) > 700&& (commandAnts.questMapping.get(ant.id)!=null&&commandAnts.questMapping.get(ant.id).type==AntActionType.MOVE)){
         NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
             commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.MOVE));
@@ -699,6 +744,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
     {
         for(FoodData fd : food){
        if(TRACKACTION)  System.out.println("getting Food");
+      if((Math.abs(fd.gridX-getCenterX())+Math.abs(fd.gridY-getCenterY()))<1000){
       ArrayList<AntData> antListToCollectFood=new ArrayList<AntData>();
       NodeData closestfoodNode=Control.myMap.get(fd.gridY).get(fd.gridX);//consider making this an algorithm, this is closest to Bullet base
       ArrayList<AntData> mySortedAntList=data.myAntList;//
@@ -740,9 +786,38 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
           commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.PICKUP));
         commandAnts.commandMap.put(ant.id, commandAnts.collectFood(ant,closestfoodNode));//tells the ants to collect the water
       }
+        }
+    }
+    }
+  
+  
+  
+  
+  private void attackIntruders(CommData data,ArrayList<AntData> targets){
+  
+      BLine bline =new BLine();
       
-    }
-    }
+      
+      for(AntData ant:data.myAntList){
+          
+   NodeData currentNode=   Control.myMap.get(ant.gridY).get(ant.gridY);
+      
+     DistanceCompare myDistComp=new DistanceCompare();//SET the compare node in this class!!!      
+      
+      myDistComp.goalNode=currentNode;//now it is set
+      
+      Collections.sort(targets,myDistComp);//sortedAntList now sorted
+      
+      
+      
+      AntData target=targets.get(0);
+      targets.remove(0);
+
+  if(ant.antType==AntType.ATTACK&&((Math.abs(ant.gridX-getCenterX())+Math.abs(ant.gridY-getCenterY()))<800)){
+      commandAnts.commandMap.put(ant.id, bline.findPath(currentNode,  Control.myMap.get(target.gridY).get(target.gridY)));
+      commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.ATTACK));
+  }
+ }
   
   
   
@@ -751,7 +826,31 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
   
   
   
+  }
   
+  ///for one ant.
+   private void attackIntruders(AntData ant,ArrayList<AntData> targets){
+        BLine bline =new BLine();
+   
+   NodeData currentNode=   Control.myMap.get(ant.gridY).get(ant.gridY);
+      
+     DistanceCompare myDistComp=new DistanceCompare();//SET the compare node in this class!!!      
+      
+      myDistComp.goalNode=currentNode;//now it is set
+      
+      Collections.sort(targets,myDistComp);//sortedAntList now sorted
+      
+      
+      
+      AntData target=targets.get(0);
+      targets.remove(0);
+
+  if(ant.antType==AntType.ATTACK){
+      commandAnts.commandMap.put(ant.id, bline.findPath(currentNode,  Control.myMap.get(target.gridY).get(target.gridY)));
+      commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.ATTACK));
+   
+   }
+   }
   private void collectWater(CommData data)
     {
         
@@ -937,6 +1036,30 @@ if(e.isControlDown()&&e.getKeyCode()==VK_X)      myClient.closeAll();
   
   
   }
+  
+    private Direction getObstructedDir(AntData ant,ArrayList<AntData> antList){
+  
+  for(int i=-1;i<2;i++){
+      for(int j=-1;j<2;j++){
+    
+         for(AntData otherAnt: antList){
+         if(ant.gridX+i==otherAnt.gridX&&ant.gridY+j==otherAnt.gridY){
+        return GetDirection.returnDirEnum(j, i);
+         }
+         
+         
+         }
+  
+  }}
+  return null;
+  
+  
+  
+  }
+  
+  
+  
+  
   
   
   
