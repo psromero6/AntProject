@@ -1,6 +1,6 @@
 package antworld.client;
 
-import static antworld.client.AntWorld.gameBoard;
+import static antworld.client.GraphicContainer.gameBoard;
 import antworld.data.AntAction;
 import antworld.data.AntAction.AntActionType;
 import antworld.data.AntData;
@@ -32,14 +32,13 @@ public class ClientControl
   private static final boolean DEBUG = false;
   private static final boolean TRACKACTION = false;//print individual ant actions
   private static final boolean SCOREING = true;//print score information
-  private static final boolean DRAW =false;//draw a gameboard
-  private static final boolean DRAWTASK =false;//outline individual ant tasks
+  private static final boolean DRAW =true;//draw a gameboard
+  private static final boolean DRAWTASK =true;//outline individual ant tasks
   private static final boolean BUILD = false;//build more ants
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
   static ClientControl myClient;
-  static AntWorld antworld;//control center for graphics
-  static ActionQueue commandAnts;//ant action tracker
+  static GraphicContainer antworld;  static ActionQueue commandAnts;//ant action tracker
   private ObjectInputStream inputStream = null;
   private ObjectOutputStream outputStream = null;
   private boolean isConnected = false;
@@ -188,54 +187,29 @@ public class ClientControl
 
   public void mainGameLoop(CommData data) throws IOException
   {
-    System.out.println("mainGameLoop");
+    
     if (DRAW)
     {
-      antworld = new AntWorld(data);
+        //makes drawing object
+      antworld = new GraphicContainer(data);
     }
-     System.out.println("controlStart");
+    
     MapControl myControl = new MapControl();    oldFood=new ArrayList<>();
- System.out.println("controlStop");
+
     commandAnts = new ActionQueue(data);
- System.out.println("actionlQueue made");
+
  sweetSpotInt=new ArrayList<>(); 
-
+//hardCoded rich deposit of food for Bullet Nest
  NodeData knownsweet=myControl.myMap.get(2077).get(2457);
- sweetSpotInt.add(knownsweet);
-
- //sweetSpots.put(myControl.myMap.get(2016).get(2064),1);
+sweetSpotInt.add(knownsweet);
  
  antsToKill=new ArrayList<>();
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-    //antworld.setLocation(centerX, centerX);
-    //testing with initalizing actions psr
-    AntAction action = new AntAction(AntActionType.STASIS);
-    LinkedList<AntAction> myActionQueue;
 
-//        for(AntData ant :data.myAntList){
-//        myActionQueue = commandAnts.commandMap.get(ant.id);
-//        action.type=AntActionType.MOVE;
-//        action.direction=Direction.NORTH;
-//            for(int i=0;i<100;i++){ 
-//               myActionQueue.add(action);
-//           }
-//        }
-    // drawAnts(data);
+
+
     while (true)
     {if(DRAW)antworld.draw(data);
+    //reset antworld every 150 game ticks
       if (DRAW&&(data.gameTick%150==0))
       {
         antworld.resetPic();
@@ -255,7 +229,6 @@ public class ClientControl
 
         CommData sendData = data.packageForSendToServer();
 
-        //System.out.println("ClientControl: Sending>>>>>>>: " + sendData);
         outputStream.writeObject(sendData);
         outputStream.flush();
         outputStream.reset();
@@ -265,19 +238,22 @@ public class ClientControl
           System.out.println("ClientRandomWalk: listening to socket....");
         }
         
-        
+        //puts all known food data into ah array
         HashSet<FoodData> food = data.foodSet;
     FoodData[] myFoodArray = new FoodData[food.size()];
     food.toArray(myFoodArray);
+    
+    //prints out a continuous count of food and game tick and total number of ants
        if(SCOREING){ System.out.println(data.gameTick);
         for(int fd :data.foodStockPile){
         System.out.print(fd+";");        
         }
-        
-        
-        
         System.out.println("total number of ants"+data.myAntList.size()+" xxxxxxxx");
        }
+       
+       
+       
+       //looks for new food added
         for(FoodData fd : myFoodArray){
             
             if((oldFood.isEmpty()||oldFood.contains(fd)||(data.gameTick%150==0))&&fd.foodType!=FoodType.WATER){
@@ -292,6 +268,10 @@ public class ClientControl
         oldFood.addAll(food);
         
         
+        
+        
+        
+        //adds new enemy ants to antsToKill 
        for(AntData ant : data.enemyAntSet){
            // System.out.println(fd.foodType+";"+fd.gridX+";"+fd.gridY);
             if((antsToKill.isEmpty()||antsToKill.contains(ant)||(data.gameTick%150==0)))
@@ -372,34 +352,24 @@ public class ClientControl
 
   }
 
+  //applies myAction to all ants in myAntlist
   private void chooseActionsOfAllAnts(CommData data)
   {
-     // if(data.foodStockPile[0]<350) collectWater=true;
+
     BLine myPath=new BLine();
     NodeData homeNode=MapControl.myMap.get(centerY).get(centerX);
-    
-    
     
     HashSet<FoodData> food = data.foodSet;
     FoodData[] myFoodArray = new FoodData[food.size()];
     food.toArray(myFoodArray);
     
-   
-    
-    
-    
-    
-    
-    
-    
     for (AntData ant : data.myAntList)
     {
         int nestDistance=Math.abs(ant.gridX-centerX)+Math.abs(ant.gridY-centerY);
-        
-        
-        
+ 
+        //primary action is to drop food on the nest.
         if(ant.carryUnits>0&&nestDistance<19){
-      if(SCOREING) System.out.println("Drop it sucka");
+      if(SCOREING) System.out.println("Droped Food in Nest");
         AntAction dropaction=new AntAction(AntActionType.DROP);
         dropaction.direction=Direction.getRandomDir();
         dropaction.quantity=ant.carryUnits;
@@ -407,14 +377,15 @@ public class ClientControl
         }
         
         
-        else if(ant.health<10&&nestDistance<19&&!ant.underground){
+        //heals low health ants if they appoach the nest
+        else if(ant.health<20&&nestDistance<19&&!ant.underground){
          if(SCOREING) System.out.println("GetDown");
-         AntAction duckaction=new AntAction(AntActionType.ENTER_NEST);
+         AntAction duckaction=new AntAction(AntActionType.HEAL);
          ant.myAction=duckaction;
         }
         
         
-        
+        //buil in command to have all ants hide
         else if(goHome){
         NodeData currentNode=MapControl.myMap.get(ant.gridY).get(ant.gridX);
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, homeNode));
@@ -422,17 +393,18 @@ public class ClientControl
             commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.ENTER_NEST));
         }
         
+        
+        ///set this action for really aggressive suicidal ants
         else if(getObstructedDir(ant,antsToKill)!=null&&ant.carryUnits==0){
         
         AntAction driveBy=new AntAction(AntActionType.ATTACK);
         driveBy.direction=getObstructedDir(ant,antsToKill);
         
         //ant.myAction=driveBy;
-        
-     
-        
+
         }
         else{
+            //sends ants on a quest home
         if(ant.carryUnits>0&&(commandAnts.questMapping.get(ant.id)==null||(commandAnts.questMapping.get(ant.id).type!=AntActionType.DROP)))
         {
             if(TRACKACTION) System.out.println("I have grub.........................................");
@@ -449,7 +421,7 @@ public class ClientControl
         }
         else
         {
-           // commandAnts.updateActionQueue(ant);
+           // returns quest completion info;
             AntAction action = chooseAction(data, ant);
             if(action.type==AntActionType.DROP)
             {
@@ -464,18 +436,15 @@ public class ClientControl
             ant.myAction = action;
         }
     }
+        //only one goHome call is needed
     goHome=false;
-    
+    //checks water stockpile every 1000 game ticks
     if(data.foodStockPile[1]<200&&data.gameTick%1000==0) collectWater(data);
 
     
-    
-    
-   
-    
-    
-    
   }
+    
+    //builds new ants of the kind that we want, saves the rest for points
     if(BUILD&&data.myAntList.size()<250){
    if(data.foodStockPile[3]>100){
   AntData attackAnt=new AntData(Constants.UNKNOWN_ANT_ID, AntType.ATTACK, data.myNest, data.myTeam);
@@ -489,13 +458,10 @@ public class ClientControl
   data.myAntList.add(speedAnt);
    
   }
-  if(data.foodStockPile[7]>100){
-  AntData speedAnt=new AntData(Constants.UNKNOWN_ANT_ID, AntType.MEDIC, data.myNest, data.myTeam);
-  speedAnt.myAction=new AntAction(AntActionType.BIRTH); 
-  data.myAntList.add(speedAnt);
-   
-  }
+
     }
+    
+    //if an enemy ant attacks, we begin a blind flurry assault
   for(AntData dickAnt: data.enemyAntSet){
       //System.out.println(dickAnt.myAction.type);
   if(dickAnt.myAction.type==AntActionType.ATTACK){
@@ -506,16 +472,14 @@ public class ClientControl
   
   
   }
-
+//chose action for individual ant, this is for ants that are already questing
+  
   private AntAction chooseAction(CommData data, AntData ant)
   {
       
     AntAction action = new AntAction(AntActionType.STASIS);
     BLine myPath=new BLine();
-    //testing
-    // if(ant.alive){action.type=AntActionType.MOVE;
-    //action.direction=Direction.getRandomDir();
-    //return action;}
+   
     LinkedList<AntAction> myActionQueue;
     myActionQueue = commandAnts.commandMap.get(ant.id);
    
@@ -524,15 +488,14 @@ public class ClientControl
     
     
     
-    
+    //finish the move started.
     if (ant.ticksUntilNextAction > 0)
     {
-      //System.out.println("waiting on " + ant.ticksUntilNextAction + " ticks   " + ant.id);
       return ant.myAction;
     }
 
     
-    
+    //indicates ants carrying a load
     if(ant.carryUnits>0){
    if(TRACKACTION)  System.out.println("has food.."+ant.gridX+";"+ant.gridY+"...................");
    if(DRAWTASK) antworld.drawMapCircle(ant.gridX, ant.gridY,carryRGB);
@@ -541,7 +504,7 @@ public class ClientControl
     
     
     
-    
+    //if a quest for dropping of food is not set, and the ant has food, a quest is set
     if(ant.carryUnits>0&&commandAnts.questMapping.get(ant.id)==null){
         
        commandAnts.commandMap.get(ant.id).clear();
@@ -558,7 +521,7 @@ public class ClientControl
     
     
     
-    
+   
     if (ant.underground)
     {
       if(ant.health<10)//do not emerge at less than half health
@@ -568,14 +531,7 @@ public class ClientControl
         return healAction;
       }
      if(TRACKACTION)  System.out.println("Climbing out   " + ant.id);
-      //initalizing the queque
-
-    //  action = scatter(ant.id);
-
-//      for (int i = 0; i < 100; i++)
-//      {
-//      myActionQueue.add(action);
-//      }
+//exit nest
       AntAction exitAction = new AntAction(AntActionType.EXIT_NEST);
       exitAction.x = centerX - Constants.NEST_RADIUS + random.nextInt(2 * Constants.NEST_RADIUS);
       exitAction.y = centerY - Constants.NEST_RADIUS + random.nextInt(2 * Constants.NEST_RADIUS);
@@ -597,25 +553,13 @@ if((ant.health<10)&&(commandAnts.questMapping.get(ant.id)==null||commandAnts.que
     }
 
 
-
-
-
-
-
-
-
-//with an empty queue the ant runs one direction until he hits a wall. then he will run another
-
-    //  NestData nestData=data.nestData[myNestName.ordinal()];
+//build food array
     HashSet<FoodData> food = data.foodSet;
     FoodData[] myFoodArray = new FoodData[food.size()];
     food.toArray(myFoodArray);
     
-    //   System.out.println(a.length+";"+data.foodSet.isEmpty());
-    
-    
-   
-   
+
+   //finds ants to pick up food
 if (commandAnts.commandMap.get(ant.id)==null
         ||commandAnts.commandMap.get(ant.id).isEmpty()
         ||commandAnts.questMapping.get(ant.id)==null
@@ -628,7 +572,7 @@ if (commandAnts.commandMap.get(ant.id)==null
       if(Math.abs(f.gridX - ant.gridX) + Math.abs(f.gridY - ant.gridY) < 10&&f.foodType!=FoodType.WATER&&ant.carryUnits<1)
       {
       if(TRACKACTION)     System.out.println("food seen:"+ant.id);
-        AntAction currentQuest = commandAnts.questMapping.get(ant.id);//if the ant is within 200 units of foos AND its current action is not to go get that, then build and action list to do so
+        AntAction currentQuest = commandAnts.questMapping.get(ant.id);//if the ant is within 10 units of foos AND its current action is not to go get that, then build and action list to do so
       if(TRACKACTION)   System.out.println("food seen"+currentQuest);
         if(currentQuest==null||currentQuest.type==AntActionType.MOVE){
        if(TRACKACTION)    System.out.println("starting food quest");
@@ -665,38 +609,32 @@ if (commandAnts.commandMap.get(ant.id)==null
 //          System.out.println("ant" + ant.id + " has low health, starting return to base");
          commandAnts.questMapping.put(ant.id, null);
         }
+        }
        
-       
-//       if(commandAnts.commandMap.get(ant.id).isEmpty())commandAnts.commandMap.put(ant.id , commandAnts.nestToHeal(ant));
-      // myActionQueue = commandAnts.commandMap.get(ant.id);
-      //  AntAction nextActionFromList = myActionQueue.pop();//after list is built, get the first action on that list
-       // return nextActionFromList;
-      }
-        //System.out.println("this ant is on a quest"+ant.gridX+";"+ant.gridY);
         else if ((commandAnts.questMapping.get(ant.id).type == AntActionType.PICKUP)&&!myActionQueue.isEmpty())//if that quest was to pick up food
       {
        if(TRACKACTION)  System.out.println(ant.id+":pickup");
         AntAction nextActionFromList = myActionQueue.pop();//after list is built, get the first action on that list
-        
-       //System.out.println("geting list action"+nextActionFromList.type+";"+nextActionFromList.direction);
+
         return nextActionFromList;
       }
-      else if((commandAnts.questMapping.get(ant.id).type == AntActionType.MOVE)){
-        //  System.out.println(ant.id+":exploring"+ant.myAction+";"+ant.ticksUntilNextAction);
-
+      else if((commandAnts.questMapping.get(ant.id).type == AntActionType.MOVE))//moving/exploring
+      {
+       
           if(isObstructed(ant,data)){
              randomTrack(ant);
          }
            NodeData currentNode=MapControl.myMap.get(ant.gridY).get(ant.gridX);
-           //System.out.println(currentNode.getElevation());
-           
+         
+           //run away to home if there are baddies nearby
            boolean safeZone=true;
            for(AntData dickAnt :data.enemyAntSet){
            
            if((Math.sqrt((dickAnt.gridX- ant.gridX)*(dickAnt.gridX- ant.gridX) + (dickAnt.gridY - ant.gridY)*(dickAnt.gridY - ant.gridY)) < 3 ))
            safeZone=false;
            }
-           
+           //an Elevationof100 is set for ants living on top of a hill. that 
+           //we meant to keep for ourselves
         if(currentNode.getElevation()<100||!safeZone)
         {
        
@@ -982,8 +920,8 @@ if (commandAnts.commandMap.get(ant.id)==null
   public void randomTrack(AntData ant)
   {
       BLine bline=new BLine();
-      if (random.nextDouble()<0.3){
-          NodeData location=sweetSpotInt.get( (int) (random.nextDouble()*sweetSpotInt.size()));
+      if (random.nextDouble()<0.0){
+          NodeData location=sweetSpotInt.get(0);
       commandAnts.commandMap.put(ant.id,bline.findPath( MapControl.myMap.get(ant.gridY).get(ant.gridX), location));
       commandAnts.questMapping.put(ant.id,new AntAction(AntActionType.ENTER_NEST));
       }
@@ -1008,7 +946,7 @@ if (commandAnts.commandMap.get(ant.id)==null
   public void drawAnts(CommData data) throws IOException
   {
     //AntWorld 
-    //antworld = new AntWorld(data);
+    //antworld = new GraphicContainer(data);
 
   }
 
