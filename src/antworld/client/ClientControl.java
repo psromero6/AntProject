@@ -324,8 +324,17 @@ public class ClientControl {
                 if (SCOREING) {
                     System.out.println("GetDown");
                 }
-                AntAction duckaction = new AntAction(AntActionType.HEAL);
+                LinkedList<AntAction> getdown=new LinkedList<>();
+                 AntAction duckaction = new AntAction(AntActionType.ENTER_NEST);
                 ant.myAction = duckaction;
+                
+                //continue;
+                getdown.add(duckaction);
+                commandAnts.commandMap.put(ant.id,getdown);
+
+                commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.ENTER_NEST));
+               
+                
             } //buil in command to have all ants hide
             else if (goHome) {
                 NodeData currentNode = MapControl.myMap.get(ant.gridY).get(ant.gridX);
