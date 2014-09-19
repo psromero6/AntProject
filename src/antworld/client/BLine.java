@@ -18,10 +18,15 @@ public class BLine
   public static ArrayList<ArrayList<NodeData>> myMap = Control.myMap;
   
   private static final boolean DRAWLINES = true;
-  public BLine()
-  {
-  }
-
+  
+  /****************************************************************************
+   *findPath  
+   *  input:start node and goal node for the BLine path
+   *  output:list of AntAction of type move to travel from the start to goal location
+   *  description: calculates a path in a "straight" line (on 8 dir move, traveling
+   *    at a diagonal until only moves in x or y remain is as many steps as an
+   *    apparent straight line) and returns this path as an ArrayList.
+  ****************************************************************************/
   public LinkedList<AntAction> findPath(NodeData myStartLoc, NodeData myGoalLoc)
   {
     LinkedList<AntAction> moveList = new LinkedList<AntAction>();
@@ -92,8 +97,14 @@ public class BLine
     return moveList;
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////
+  /****************************************************************************
+   *drawStep  
+   * input:node to draw a pixel at
+   *  output:none
+   *  description: draws the path of the BLine on the map image (accesses 
+   *    draw method in clientRandomWalk. called to show when an ant is traveling
+   *    to food or back to base
+  ****************************************************************************/
   public void drawStep(NodeData currentNode)
   {
     int currRow = currentNode.getRowID();

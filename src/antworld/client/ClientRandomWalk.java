@@ -30,33 +30,32 @@ import java.util.Random;
 public class ClientRandomWalk
 {
   private static final boolean DEBUG = false;
-  private static final boolean TRACKACTION = false;
-  private static final boolean SCOREING = true;
-  private static final boolean DRAW =true;
-  private static final boolean DRAWTASK =true;
-  private static final boolean BUILD = false;
-  private boolean threadintest = true;
+  private static final boolean TRACKACTION = false;//print individual ant actions
+  private static final boolean SCOREING = true;//print score information
+  private static final boolean DRAW =false;//draw a gameboard
+  private static final boolean DRAWTASK =false;//outline individual ant tasks
+  private static final boolean BUILD = false;//build more ants
   private static final TeamNameEnum myTeam = TeamNameEnum.Buffalograss;
   private static final long password = 122538603443L;//Each team has been assigned a random password.
-  static ClientRandomWalk myClient;//package private?
-  static AntWorld antworld;
-  static ActionQueue commandAnts;
+  static ClientRandomWalk myClient;
+  static AntWorld antworld;//control center for graphics
+  static ActionQueue commandAnts;//ant action tracker
   private ObjectInputStream inputStream = null;
   private ObjectOutputStream outputStream = null;
   private boolean isConnected = false;
-  private boolean goHome=true;
+  private boolean goHome=true;//sends all ants home
   private NestNameEnum myNestName = null;
   private int centerX, centerY;
-  private int[] solidFood;
+  private int[] solidFood;//food to pickup-worthpoints
   private Socket clientSocket;
-  private ArrayList<FoodData> oldFood;
-  private ArrayList<AntData> antsToKill;
+  private ArrayList<FoodData> oldFood;//Food that we knew about
+  private ArrayList<AntData> antsToKill;//Ants that are a threat
   private static Random random = Constants.random;
+ //colors for various actions
   private int[] boomRGB={255,0,0};
   private int[] stalkRGB={0,0,255};
   private int[] carryRGB={0,125,125};
-  private ArrayList<NodeData> sweetSpotInt;
-  private HashMap<NodeData,Integer> sweetSpots;
+  private ArrayList<NodeData> sweetSpotInt;//points of interest, places that we found food.
   
   
   public ClientRandomWalk(String host, int portNumber) throws IOException
@@ -449,9 +448,7 @@ public class ClientRandomWalk
             NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
             
             
-           // PathThread path=new PathThread(currentNode,Control.myMap.get((int)homeishy).get((int)homeishx));
-           //if(threadintest) path.run();
-           //threadintest=false;
+ 
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get((int)homeishy).get((int)homeishx)));
             
             commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.DROP));
@@ -564,33 +561,6 @@ public class ClientRandomWalk
            
     
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
@@ -719,8 +689,19 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
           if(isObstructed(ant,data)){
              randomTrack(ant);
          }
-        if(Math.sqrt((centerX+35 - ant.gridX)*(centerX+35 - ant.gridX) + (centerY-35 - ant.gridY)*(centerY-35 - ant.gridY)) > 200){
-        NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
+           NodeData currentNode=Control.myMap.get(ant.gridY).get(ant.gridX);
+           //System.out.println(currentNode.getElevation());
+           
+           boolean safeZone=true;
+           for(AntData dickAnt :data.enemyAntSet){
+           
+           if((Math.sqrt((dickAnt.gridX- ant.gridX)*(dickAnt.gridX- ant.gridX) + (dickAnt.gridY - ant.gridY)*(dickAnt.gridY - ant.gridY)) < 3 ))
+           safeZone=false;
+           }
+           
+        if(currentNode.getElevation()<1000||!safeZone)//(Math.sqrt((centerX+35 - ant.gridX)*(centerX+35 - ant.gridX) + (centerY-35 - ant.gridY)*(centerY-35 - ant.gridY)) > 700)
+        {
+       
             commandAnts.commandMap.put(ant.id,myPath.findPath(currentNode, Control.myMap.get(centerY).get(centerX)));
             commandAnts.questMapping.put(ant.id, new AntAction(AntActionType.EXIT_NEST));
         }
@@ -1002,7 +983,7 @@ if (commandAnts.commandMap.get(ant.id)==null||commandAnts.commandMap.get(ant.id)
   public void randomTrack(AntData ant)
   {
       BLine bline=new BLine();
-      if (random.nextDouble()<0.5){
+      if (random.nextDouble()<0.1){
           NodeData location=sweetSpotInt.get( (int) (random.nextDouble()*sweetSpotInt.size()));
      // int prob =sweetSpots.get(random.nextDouble()*sweetSpots.size());
       commandAnts.commandMap.put(ant.id,bline.findPath( Control.myMap.get(ant.gridY).get(ant.gridX), location));

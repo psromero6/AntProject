@@ -27,8 +27,13 @@ public class ActionQueue
     public HashMap<Integer, AntAction> questMapping=new HashMap<Integer, AntAction>();//this mapping will tell us what quest an ant is currently on //AntAction.HEAL if returning to heak, AntAction.PICKUP if going to collect food etc.
     public final int centerX, centerY;
 
-    //need a way to add remove queues and ants if they are born or if they die
-
+    /****************************************************************************
+   *Constructor
+   *  input: commData, from which we access myComm.myAntlist
+   *  description: creates an ActionQueue object which contains hashmaps to ant
+   *    queues of their action and hashmaps to ant quest. This object is used
+   *    to build action queues for ants
+  ****************************************************************************/
     public ActionQueue(CommData myComm)
     {
             NestNameEnum myNestName = myComm.myNest;
@@ -44,14 +49,13 @@ public class ActionQueue
         }
     }
 
-//    public void updateActionQueue(AntData ant)
-//    {
-//        LinkedList<AntAction> myActionQueue = commandMap.get(ant.id);//get the value for this key
-//
-//        AntAction myAction = new AntAction(AntActionType.STASIS);
-//        myActionQueue.add(myAction);
-//    }
-    
+  /****************************************************************************
+   * collectFood
+   *  input:AntData and food node
+   *  output:list of actions mapped to the given ant
+   *  description: builds given ant's action queue to go to the given node,
+   *    pick up food, return to base and drop it.
+  ****************************************************************************/    
     public LinkedList<AntAction> collectFood(AntData ant, NodeData foodNode)//currently, this method returns the action list it built AND also populates the list of the and handed to it
   {
         System.out.println("getfood");
@@ -153,6 +157,13 @@ public class ActionQueue
     return fetchList;
   }
     
+    /****************************************************************************
+   *nestToHeal
+   *  input:AntData to heal
+   *  output: list of actions mapped to the given ant
+   *  description: builds queue of actions for the given ant to go to nest, burrow
+   *    and heal
+  ****************************************************************************/
    public LinkedList<AntAction> nestToHeal(AntData ant)
    {
     int currentRow = ant.gridY;
@@ -188,9 +199,4 @@ public class ActionQueue
      
      return actionList;
    }
-   
-   public LinkedList<AntAction> collectWater(AntData ant, NodeData foodNode)//currently, this method returns the action list it built AND also populates the list of the and handed to it
-  {
-     return null;
-  }
 }
