@@ -11,12 +11,20 @@ import java.util.Comparator;
 
 /**
  *
- * @author 363620
+ * @author Hans
  */
 public class DistanceCompare implements Comparator<AntData>//returns lesser distance
 {
-  public NodeData goalNode=Control.myMap.get(0).get(0);//distance will be measured to this node, it MUST be set, or else it will measure distance to the upper lefthand
+  public NodeData goalNode=MapControl.myMap.get(0).get(0);//distance will be measured to this node, it MUST be set, or else it will measure distance to the upper lefthand
   
+  /****************************************************************************
+   *compare
+   *  input:2 AntDatas to compare in distance to a third location
+   *  output: integer, positive, zero, or negative for first closer, equidisant
+   *    or second closer, repectively
+   *  description: compares distances for 2 ant. must set the node where comparison
+   *    occurs externally.
+  ****************************************************************************/
   @Override
   public int compare(AntData ant1, AntData ant2)
   {

@@ -1,6 +1,11 @@
+/******************************************************************************
+ * Hans Weeks
+ * 
+ * Class for the NodeData object. This class contains all the information
+ * and methods necessary to calculate an A* path, namely calculating
+ * the G,H, and F values.
+/*****************************************************************************/
 package antworld.client;
-
-
 
 import antworld.data.LandType;
 import java.awt.Color;
@@ -25,21 +30,21 @@ public class NodeData
   //private boolean goalLoc=false;
   private NodeData parentNode;
   private NodeData tentativeParentNode;
-  
+
+  /******************************************************************************
+   * Input:integers for the column and row of the node int the map, and its
+   *  movement weight as an int.
+   * Output:None, this is the constructor
+   * Description:creates a node object from three ints provided
+  /*****************************************************************************/
   public NodeData(int row, int col, int green)//int[] colorin)
-  {
-    //TODO are these in the right order (row,col)?
+  {    
    rowID=row;
    colID=col;
-   //color=colorin;
-   //if (Arrays.equals(RGB(LandType.WATER.getMapColor()),(colorin))){
    
-  // elevation=Integer.MAX_VALUE;
-  // }
-  // else{
    elevation=green;
-  // }
   }
+  
   
   public void setParent(NodeData child)
   {
@@ -51,6 +56,12 @@ public class NodeData
     child.tentativeParentNode=this;
   }
   
+  /******************************************************************************
+   * Input:startNode
+   * Output:none
+   * Description:calculates the cost to move from an adjacent node to this one,
+   *  based on elevation changes
+  /*****************************************************************************/  
   public int calcBase_Movecost(NodeData startLoc)
   {
     //TODO base startLoc is saved to the node rather than the path, for 100 ants this results in 100 start nodes
@@ -84,7 +95,12 @@ int b = (rgb>>16)&0xFF;
   }
   
   
-  
+  /******************************************************************************
+   * Input:none
+   * Output:none
+   * Description:Calculates G movecost from this.base_movecost and adding it 
+   * to its parents G movecost
+  /*****************************************************************************/
   public void calcG(NodeData startLoc)//will require access to parent node
   {
     int base_movecost=calcBase_Movecost(startLoc);
@@ -93,9 +109,12 @@ int b = (rgb>>16)&0xFF;
     else{g_movecost=base_movecost+parentNode.getG();}
   }
   
-  //this method tests to see if tentativeParentNode yields lower g value than parent Node
-  //this method does not update calcG() for new parent even if it reparents (because we want the calling
-  //function to do that)
+  /******************************************************************************
+   * Input:none
+   * Output:none
+   * Description: tests whether the current parent or tentative parent G movecost
+   * is lower, and sets the parent accordingly
+  /*****************************************************************************/
   public boolean testG(NodeData startLoc)
   {
     boolean testResult=false;
@@ -113,6 +132,11 @@ int b = (rgb>>16)&0xFF;
     return testResult;    
   }
   
+  /******************************************************************************
+   * Input:NodeData goal location
+   * Output:none
+   * Description:calculates the manhattan distance from node to goal node
+  /*****************************************************************************/
   public void calcH(NodeData goalLoc)
   {
     //TODO consider making this euclidean instead of manhattanian
@@ -127,6 +151,12 @@ int b = (rgb>>16)&0xFF;
     //h_heuristic=deltaX+deltaY;
   }
   
+  /******************************************************************************
+   * Input:none
+   * Output:none
+   * Description:calculates the F values (the key value to A*) by adding the 
+   * G and H scores
+  /*****************************************************************************/
   public void calcF()
   {
     f_value=g_movecost+h_heuristic;

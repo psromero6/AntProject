@@ -73,7 +73,7 @@ public class ActionQueue
     //\\First, calculate tile adjacent to foodNode, closest to startNode
     int currentRow = ant.gridY;
     int currentCol = ant.gridX;
-    NodeData currentNode=Control.myMap.get(currentRow).get(currentCol);
+    NodeData currentNode=MapControl.myMap.get(currentRow).get(currentCol);
     int foodRow = foodNode.getRowID();
     int foodCol = foodNode.getColID();
     int adjFoodRow;
@@ -91,7 +91,7 @@ public class ActionQueue
     }
     adjFoodRow=foodRow+yDirection;
     adjFoodCol=foodCol+xDirection;
-    adjFoodNode=Control.myMap.get(adjFoodRow).get(adjFoodCol);
+    adjFoodNode=MapControl.myMap.get(adjFoodRow).get(adjFoodCol);
     
     //\\second, set fetchList equal to the path to food
     fetchList = myLine.findPath(currentNode, adjFoodNode);
@@ -132,11 +132,11 @@ public class ActionQueue
     adjFoodCol=adjFoodCol+(stepOrthFromFood*xDirection);
     if(adjFoodRow<0)adjFoodRow=0;
     if(adjFoodCol<0)adjFoodCol=0;
-    adjFoodNode=Control.myMap.get(adjFoodRow).get(adjFoodCol);
+    adjFoodNode=MapControl.myMap.get(adjFoodRow).get(adjFoodCol);
     
     //\\fourth and final, ADD moveList to return to nest
     //System.out.println("what's the meaning?"+ClientRandomWalk.myClient.meaningOfLife);
-    currentNode=Control.myMap.get(centerY).get(centerX);
+    currentNode=MapControl.myMap.get(centerY).get(centerX);
     LinkedList<AntAction> returnList = new LinkedList<>();
     returnList=myLine.findPath(adjFoodNode,currentNode);//TODO change this to antHill, not current
 
@@ -170,8 +170,8 @@ public class ActionQueue
     int currentCol = ant.gridY;
     int homeRow = centerY;
     int homeCol = centerX;
-    NodeData currentNode=Control.myMap.get(currentRow).get(currentCol);
-    NodeData homeNode=Control.myMap.get(homeRow).get(homeCol);
+    NodeData currentNode=MapControl.myMap.get(currentRow).get(currentCol);
+    NodeData homeNode=MapControl.myMap.get(homeRow).get(homeCol);
     AntAction currentQuest=new AntAction(AntActionType.HEAL);
     questMapping.put(ant.id,currentQuest);
     BLine pathHome=new BLine();

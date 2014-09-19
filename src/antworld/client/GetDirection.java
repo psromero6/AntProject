@@ -19,6 +19,12 @@ import antworld.data.Direction;
  */
 public class GetDirection
 {
+  /****************************************************************************
+   *returnDirEnum  
+   *  input: x and y, only -1-->1 
+   *  output: direction represented as Direction enum from Direction class
+   *  description: returns the dir enum for the given x and y direction
+  ****************************************************************************/
   public static Direction returnDirEnum(int x, int y)
   {
     if(x==-1)

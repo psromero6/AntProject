@@ -15,7 +15,7 @@ import javax.swing.JLabel;
 
 public class AStar
 {  
-  public static ArrayList<ArrayList<NodeData>> myMap=Control.myMap;
+  public static ArrayList<ArrayList<NodeData>> myMap=MapControl.myMap;
   LinkedList<NodeData> openList= new LinkedList<NodeData>();
   LinkedList<NodeData> closedList= new LinkedList<NodeData>();
   ArrayList<NodeData> path=new ArrayList<NodeData>();

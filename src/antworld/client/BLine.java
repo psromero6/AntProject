@@ -15,7 +15,7 @@ import java.util.LinkedList;
  */
 public class BLine
 {
-  public static ArrayList<ArrayList<NodeData>> myMap = Control.myMap;
+  public static ArrayList<ArrayList<NodeData>> myMap = MapControl.myMap;
   
   private static final boolean DRAWLINES = true;
   
@@ -111,7 +111,7 @@ public class BLine
     int currCol = currentNode.getColID();
     int currH = 255;//Hvalue will not be populated for BLine
    // ClientRandomWalk.myClient.antworld.gameBoard.setCenter(currCol, currRow);
-  if(ClientRandomWalk.doDraw())  ClientRandomWalk.myClient.antworld.drawMapPixel(currCol, currRow, currH);
+  if(ClientControl.doDraw())  ClientControl.myClient.antworld.drawMapPixel(currCol, currRow, currH);
     
   }
 }
