@@ -1,8 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/****************************************************************************
+ * Authors: Hans Weeks and Stephen Romero
+ * 
+ * This class is instantiated from ClientCommand as CommandAnts. This class is called
+ * to build list of action for an ant.Contains a hash map from ant.id to
+ * linkedList<AntActions>, this linkedList is where we add actions for the ant to take.
+ * methods of the ActionQueue are collectFood and nestToHeal, which are used to build
+ * a complete queue for healing and collecting. When building queues,
+ * the BLine movement (straight line) is used. CommandAnts has a hashmap from 
+ * ant.id to an AntAction of specific type. We use this type to encode what quest 
+ * the ant is on:
+ * 
+ * PICKUP=collect and return with food
+ * HEAL=return to base to heal
+ * ENTER_NEST=Ant is being called back home for being too far from base
+ * MOVE=Ant is wandering to uncover food
+ * ATTACK=Ant is going to attack enemy ant
+ * 
+  ****************************************************************************/
 package antworld.client;
 
 import antworld.data.AntAction;

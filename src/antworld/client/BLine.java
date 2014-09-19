@@ -1,8 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/****************************************************************************
+   *  Authors: Hans Weeks and Stephen Romero
+   * 
+   * This class is instantiated from ActionQueue as myPath and is used to 
+   * calculate  straight line paths from a given start node to goal node.
+   * the is accomplished through the findPath method. It returns as linked list
+   * of AntActions.
+  ****************************************************************************/
 package antworld.client;
 
 import antworld.data.AntAction;

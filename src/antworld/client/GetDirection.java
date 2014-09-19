@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/****************************************************************************
+   *  Authors: Hans Weeks and Stephen Romero
+   * 
+   *This is a helper class which tells you what direction enum represents an x
+   * and y direction. To use it, pass unit directions of -1,0,1
+  ****************************************************************************/
 
 package antworld.client;
 

@@ -1,7 +1,12 @@
 package antworld.client;
+/****************************************************************************
+   *  Authors: Hans Weeks and Stephen Romero
+   * This class is used to calculate fastest paths by AStar search for 8 way moves
+   * N,E,S,W,NE,NW,SE,SW. Paths are calculated in this project from the ActionQueue
+   * class. In the version submitted Sept.18.2014, paths are BLine rather than
+   * AStar for speed of calculation.
+  ****************************************************************************/
 
-//import antworld.client.Control;
-//import antworld.client.NodeData;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;

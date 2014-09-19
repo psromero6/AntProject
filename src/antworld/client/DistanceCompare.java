@@ -1,8 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/****************************************************************************
+   *  Authors: Hans Weeks and Stephen Romero
+   * 
+   * comparator for calculating the distance 2 ants are from a given node, which
+   * must be accessed after an object has been instantiated. The comparator
+   * returns an int representation of which node is closer.
+  ****************************************************************************/
 
 package antworld.client;
 

@@ -1,4 +1,13 @@
 package antworld.client;
+/****************************************************************************
+   *  Authors: Hans Weeks and Stephen Romero
+   * 
+   * This class is instantiated by ClientControl. It builds a double arrayList
+   * of NodeData's, each node representing 1 pixel of the map. This arrayList is
+   * used throughout the program to reference locations on the map as nodes.
+   * accessed as MapControl.myMap.get(row).get(col) of location. note that
+   * row=y and col=x here, thus access is matrix style, NOT CARTESIAN COORD STYLE
+  ****************************************************************************/
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;

@@ -1,8 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/****************************************************************************
+   *  Authors: Hans Weeks and Stephen Romero
+   * 
+   * This class is instantiated by ClientCommand. In client command, when the 
+   * UnitTest Boolean DRAW is set to true, an object of this class is created
+   * which draws the map and updates it with ant locations, food locations,
+   * and trails and paths
+  ****************************************************************************/
 package antworld.client;
 
 import antworld.data.AntData;
@@ -33,7 +36,7 @@ import javax.imageio.ImageIO;
  *
  * @author Stephen
  */
-public class AntWorld
+public class GraphicContainer
 {
 
     //static Node[][] globalNodeMap;
@@ -46,7 +49,7 @@ public class AntWorld
   /**
    * @param args the command line arguments
    */
-  public AntWorld(CommData data) throws IOException
+  public GraphicContainer(CommData data) throws IOException
   {
     //globalNodeMap= buildMap(readImage());
       
